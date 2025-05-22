@@ -1,1 +1,734 @@
-1234567890
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>食物人格性格測驗</title>
+<style>
+    /* 基本樣式 */
+    body {
+        font-family: "微軟正黑體", sans-serif;
+        margin: 0;
+        padding: 30px;
+        background: #fdf5ec; /* 淺暖色背景 */
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* 讓內容至少佔滿視窗高度 */
+        box-sizing: border-box; /* 確保 padding 不會導致內容溢出 */
+    }
+
+    /* 容器樣式 */
+    .container {
+        max-width: 760px; /* 稍微增加寬度 */
+        margin: auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px; /* 更圓潤的邊角 */
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* 更明顯的陰影 */
+        text-align: center; /* 讓內容居中 */
+        display: flex; /* 使用 flexbox 讓內容垂直居中 */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px; /* 確保容器有最小高度 */
+    }
+
+    /* 標題樣式 */
+    h1, h2 {
+        color: #d65a31; /* 品牌色 */
+        margin-bottom: 25px;
+        font-size: 2.2em;
+        letter-spacing: 1px;
+    }
+    h2 {
+        font-size: 1.8em;
+    }
+
+    /* 封面頁樣式 */
+    #welcomeScreen {
+        display: flex; /* 預設顯示 */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    #welcomeScreen p {
+        font-size: 1.15em;
+        margin-bottom: 20px; /* 調整間距 */
+        color: #555;
+    }
+    
+    #welcomeScreen input[type="text"] {
+        padding: 12px 15px;
+        font-size: 1.1em;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 25px; /* 與按鈕間距 */
+        width: 80%; /* 讓輸入框佔大部分寬度 */
+        max-width: 300px; /* 最大寬度 */
+        box-sizing: border-box; /* 確保 padding 不會導致內容溢出 */
+    }
+
+    #startButton {
+        background: #d65a31;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    #startButton:hover {
+        background: #a94524;
+    }
+
+    /* 問題樣式 */
+    #quiz {
+        display: none; /* 預設隱藏 */
+        width: 100%; /* 讓測驗內容佔滿容器寬度 */
+    }
+    .question {
+        margin-bottom: 25px;
+        font-size: 1.35em;
+        color: #555;
+        font-weight: bold;
+    }
+
+    /* 選項按鈕容器 */
+    .options {
+        display: flex;
+        flex-direction: column; /* 讓按鈕垂直堆疊 */
+        gap: 10px; /* 按鈕間距 */
+        margin-bottom: 0; /* 移除選項與下一題按鈕間的間距 */
+    }
+
+    /* 選項按鈕樣式 */
+    .options button {
+        width: 100%;
+        padding: 15px 20px; /* 增加內距 */
+        font-size: 1.1em;
+        border: 2px solid #d65a31;
+        background: white;
+        color: #d65a31;
+        border-radius: 8px; /* 圓角 */
+        cursor: pointer;
+        transition: all 0.3s ease; /* 平滑過渡效果 */
+        font-weight: bold;
+    }
+
+    .options button:hover {
+        background: #e88d6c; /* 較淺的橘色 */
+        color: white;
+        border-color: #e88d6c;
+    }
+
+    /* 選中按鈕的樣式 */
+    .options button.selected {
+        background: #d65a31;
+        color: white;
+        border-color: #d65a31;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* 選中時增加陰影 */
+    }
+
+    /* 下一題/重新測驗按鈕樣式 */
+    #nextBtn, #restartBtn {
+        background: #d65a31;
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.15em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 25px; /* 增加與選項的間距 */
+        transition: background 0.3s ease;
+        display: none; /* 預設隱藏 */
+    }
+    #nextBtn:hover, #restartBtn:hover {
+        background: #a94524; /* hover 時顏色變深 */
+    }
+
+    /* 結果區塊樣式 */
+    #result {
+        margin-top: 35px;
+        padding: 20px;
+        background: #fff0e6; /* 結果區背景色 */
+        border-radius: 10px;
+        border: 1px solid #d65a31;
+        text-align: left; /* 讓結果文字靠左對齊 */
+        width: 100%;
+        box-sizing: border-box; /* 確保 padding 不會導致內容溢出 */
+    }
+    #result p {
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        color: #444;
+    }
+    #result p strong {
+        color: #d65a31;
+    }
+    #result ul {
+        list-style-type: none; /* 移除列表符號 */
+        padding-left: 0;
+        margin-top: 5px;
+    }
+    #result ul li {
+        font-size: 1em;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    .disclaimer {
+        font-size: 0.9em;
+        color: #888;
+        margin-top: 30px;
+    }
+
+    /* 結果回饋按鈕 */
+    .feedback-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 15px; /* 按鈕間距 */
+        flex-wrap: wrap; /* 小螢幕時換行 */
+    }
+    .feedback-buttons button {
+        background: #f0f0f0;
+        color: #555;
+        padding: 10px 20px;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .feedback-buttons button:hover {
+        background: #e0e0e0;
+    }
+    .feedback-buttons button.active { /* feedback 選擇後的樣式 */
+        background: #d65a31;
+        color: white;
+        border-color: #d65a31;
+    }
+
+
+    /* 響應式設計 */
+    @media (max-width: 600px) {
+        body { padding: 15px; }
+        .container { padding: 20px; border-radius: 8px; }
+        h1 { font-size: 1.8em; }
+        .question { font-size: 1.15em; }
+        .options button { padding: 12px; font-size: 1em; }
+        #nextBtn, #restartBtn, #startButton { padding: 10px 20px; font-size: 1em; }
+        .feedback-buttons { flex-direction: column; gap: 10px; }
+        #welcomeScreen input[type="text"] { width: 90%; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div id="welcomeScreen">
+        <h1>探索你的靈魂食物！</h1>
+        <p>你曾想過自己是什麼樣的食物嗎？是活潑的馬卡龍，還是沉穩的黑咖啡？</p>
+        <p>這個趣味測驗將透過一系列問題，揭示你的專屬食物人格，並告訴你適合與不適合相處的食物類型！</p>
+        <input type="text" id="userName" placeholder="輸入你的姓名 (選填)">
+        <button id="startButton">開始測驗</button>
+    </div>
+
+    <div id="quiz">
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <button id="nextBtn" onclick="nextQuestion()">下一題</button>
+    </div>
+    
+    <div id="result">
+        </div>
+    <div class="disclaimer">
+        <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
+    </div>
+</div>
+
+<script>
+// 測驗題目資料 (保持不變)
+const quizData = [
+    {
+        question: "1. 一覺醒來，你發現自己變成了一塊食物，你的第一反應？",
+        options: [
+            { text: "先觀察周圍環境，不慌不忙", mbti: "ISTJ", enneagram: 5 },
+            { text: "「也太好玩了吧！」立刻想拍 vlog", mbti: "ENFP", enneagram: 7 },
+            { text: "馬上擬定逃脫計畫", mbti: "INTJ", enneagram: 1 },
+            { text: "淡淡地接受命運，感嘆人生多變", mbti: "INFP", enneagram: 4 }
+        ]
+    },
+    {
+        question: "2. 第一關卡是：與陌生食物自我介紹，你會？",
+        options: [
+            { text: "熱情開場，還幫別人介紹", mbti: "ESFJ", enneagram: 2 },
+            { text: "簡短講完就想快閃", mbti: "ISTP", enneagram: 5 },
+            { text: "講得很哲學，希望有人懂你", mbti: "INFJ", enneagram: 4 },
+            { text: "偷偷觀察其他人如何做再行動", mbti: "ISFJ", enneagram: 6 }
+        ]
+    },
+    {
+        question: "3. 有人說你很像「甜點系」食物，你怎麼回應？",
+        options: [
+            { text: "「謝謝誇獎，我也覺得我很香！」", mbti: "ESFP", enneagram: 3 },
+            { text: "「我其實是鹹的，別誤會我了」", mbti: "ISTJ", enneagram: 1 },
+            { text: "「你覺得像甜的，是因為你不懂我。」", mbti: "INFP", enneagram: 4 },
+            { text: "「那我就來發揮甜點的最大價值！」", mbti: "ENTJ", enneagram: 8 }
+        ]
+    },
+    {
+        question: "4. 你被選為隊長，要帶領大家，你會？",
+        options: [
+            { text: "公開表決，大家說了算", mbti: "ISFJ", enneagram: 9 },
+            { text: "親自規劃戰術與分工", mbti: "ENTJ", enneagram: 8 },
+            { text: "默默完成最多事情但不爭功", mbti: "ISTP", enneagram: 6 },
+            { text: "用故事鼓舞大家的心", mbti: "ENFJ", enneagram: 2 }
+        ]
+    },
+    {
+        question: "5. 你發現有人作弊，但成績很好，你會？",
+        options: [
+            { text: "錄影檢舉，公平最重要", mbti: "ISTJ", enneagram: 1 },
+            { text: "私下找他談談，勸他坦白", mbti: "INFJ", enneagram: 2 },
+            { text: "默默記下來，但不出聲", mbti: "INTP", enneagram: 5 },
+            { text: "想說這只是遊戲，何必較真", mbti: "ESFP", enneagram: 7 }
+        ]
+    },
+    {
+        question: "6. 突然一場火災發生，你的反應是？",
+        options: [
+            { text: "立刻想辦法逃生並幫助他人", mbti: "ENFJ", enneagram: 6 },
+            { text: "躲起來思考哪裡最安全", mbti: "INTP", enneagram: 5 },
+            { text: "「這可能是命運的考驗…」開始自省", mbti: "INFP", enneagram: 4 },
+            { text: "「燃燒吧！我就是火焰！」", mbti: "ESTP", enneagram: 8 }
+        ]
+    },
+    {
+        question: "7. 你碰到「玻璃心起司鍋」隊友，一直玻璃心怎麼辦？",
+        options: [
+            { text: "讓他哭一哭再抱抱", mbti: "ISFP", enneagram: 2 },
+            { text: "直接告訴他「你要堅強一點！」", mbti: "ESTJ", enneagram: 1 },
+            { text: "請別人幫我處理，我不想被情緒勒索", mbti: "INTP", enneagram: 5 },
+            { text: "陪他畫畫聊聊天，轉移情緒", mbti: "ENFP", enneagram: 4 }
+        ]
+    },
+    {
+        question: "8. 遇到重要選擇，你通常怎麼做？",
+        options: [
+            { text: "分析利弊再決定", mbti: "INTJ", enneagram: 1 },
+            { text: "聽從直覺與情緒", mbti: "INFP", enneagram: 4 },
+            { text: "問朋友大家意見如何", mbti: "ESFJ", enneagram: 6 },
+            { text: "先衝再說，之後再調整", mbti: "ESTP", enneagram: 7 }
+        ]
+    },
+    {
+        question: "9. 評審問你：「你存在的意義是？」你說？",
+        options: [
+            { text: "「為了讓別人開心、被喜歡！」", mbti: "ENFP", enneagram: 2 },
+            { text: "「為了完成使命，挑戰極限。」", mbti: "INTJ", enneagram: 8 },
+            { text: "「沒有意義，但我會自己創造。」", mbti: "INFP", enneagram: 4 },
+            { text: "「我是提供解決方案的那個人。」", mbti: "ISTJ", enneagram: 5 }
+        ]
+    },
+    {
+        question: "10. 如果可以選擇重生，你會選成？",
+        options: [
+            { text: "沒人認得我，我可以重新定義自己", mbti: "INFP", enneagram: 4 },
+            { text: "功能強大、受人倚賴的角色", mbti: "ESTJ", enneagram: 3 },
+            { text: "可愛又有人保護我", mbti: "ISFP", enneagram: 6 },
+            { text: "跟現在一樣，我覺得我不錯", mbti: "ISFJ", enneagram: 9 }
+        ]
+    },
+    {
+        question: "11. 你隊友被淘汰了，你會？",
+        options: [
+            { text: "立刻安慰並幫忙", mbti: "ENFJ", enneagram: 2 },
+            { text: "默默感到難過，自己也陷入低潮", mbti: "INFP", enneagram: 4 },
+            { text: "迅速調整策略，繼續前進", mbti: "INTJ", enneagram: 8 },
+            { text: "覺得是自然淘汰，沒什麼大不了", mbti: "ISTP", enneagram: 5 }
+        ]
+    },
+    {
+        question: "12. 你發現你暗戀的角色是敵隊的…？",
+        options: [
+            { text: "想辦法和他私下聯絡", mbti: "ENFP", enneagram: 7 },
+            { text: "隱藏情感，專注比賽", mbti: "ISTJ", enneagram: 1 },
+            { text: "苦惱又矛盾，心情複雜", mbti: "INFP", enneagram: 4 },
+            { text: "覺得這是有趣的挑戰", mbti: "ESTP", enneagram: 8 }
+        ]
+    },
+    {
+        question: "13. 評審叫你即興表演，你會？",
+        options: [
+            { text: "大膽表演，成為焦點", mbti: "ESFP", enneagram: 3 },
+            { text: "謹慎準備，求完美", mbti: "ISTJ", enneagram: 1 },
+            { text: "發揮創意，玩出新花樣", mbti: "ENFP", enneagram: 7 },
+            { text: "保持冷靜，穩穩完成", mbti: "ISFJ", enneagram: 6 }
+        ]
+    },
+    {
+        question: "14. 同隊有人搶走功勞，你會？",
+        options: [
+            { text: "直接對質，維護自己的權益", mbti: "ESTJ", enneagram: 8 },
+            { text: "心裡不滿，但選擇忍耐", mbti: "ISFP", enneagram: 9 },
+            { text: "試著轉移注意力，避免衝突", mbti: "ENFP", enneagram: 2 },
+            { text: "暗自努力證明自己更強", mbti: "INTJ", enneagram: 1 }
+        ]
+    },
+    {
+        question: "15. 你想怎樣被記得？",
+        options: [
+            { text: "有愛心且被大家需要", mbti: "ESFJ", enneagram: 2 },
+            { text: "勇敢且成就非凡", mbti: "ENTJ", enneagram: 8 },
+            { text: "獨特且充滿創意", mbti: "INFP", enneagram: 4 },
+            { text: "安穩可靠，值得信賴", mbti: "ISFJ", enneagram: 6 }
+        ]
+    },
+    {
+        question: "16. 休息時間你會？",
+        options: [
+            { text: "獨自沉思，充電休息", mbti: "INTJ", enneagram: 5 },
+            { text: "熱鬧社交，認識新朋友", mbti: "ESFP", enneagram: 7 },
+            { text: "和熟悉的人聊聊天", mbti: "ISFJ", enneagram: 9 },
+            { text: "做點喜歡的小事情放鬆", mbti: "ISFP", enneagram: 4 }
+        ]
+    },
+    {
+        question: "17. 你最怕什麼？",
+        options: [
+            { text: "被忽視與遺忘", mbti: "INFP", enneagram: 4 },
+            { text: "失控和混亂", mbti: "ESTP", enneagram: 8 },
+            { text: "無用與被拒絕", mbti: "ISTJ", enneagram: 1 },
+            { text: "孤獨與被排斥", mbti: "ISFJ", enneagram: 6 }
+        ]
+    },
+    {
+        question: "18. 你會選擇當？",
+        options: [
+            { text: "隊伍裡的助手，協助大家", mbti: "ESFJ", enneagram: 2 },
+            { text: "領導者，掌握全局", mbti: "ENTJ", enneagram: 8 },
+            { text: "觀察者，冷靜分析", mbti: "INTP", enneagram: 5 },
+            { text: "自由行動者，靈活應變", mbti: "ESTP", enneagram: 7 }
+        ]
+    },
+    {
+        question: "19. 食物界大戰即將開打，你準備怎麼做？",
+        options: [
+            { text: "仔細計畫與準備", mbti: "ISTJ", enneagram: 1 },
+            { text: "隨遇而安，適應環境", mbti: "ISFP", enneagram: 6 },
+            { text: "組織團隊，發揮合作", mbti: "ENFJ", enneagram: 2 },
+            { text: "衝鋒陷陣，帶頭攻擊", mbti: "ESTP", enneagram: 8 }
+        ]
+    },
+    {
+        question: "20. 最後你想說？",
+        options: [
+            { text: "「人生就是要有趣！」", mbti: "ENFP", enneagram: 7 },
+            { text: "「責任與堅持，才是王道」", mbti: "ISTJ", enneagram: 1 },
+            { text: "「愛與和平，最重要」", mbti: "ISFJ", enneagram: 9 },
+            { text: "「挑戰極限，無所畏懼」", mbti: "ENTJ", enneagram: 8 }
+        ]
+    }
+];
+
+// 食物人格描述資料 (描述更籠統，適合隨機產生後讓使用者自行聯想)
+const foodPersonalities = {
+    "macaron": {
+        name: "馬卡龍",
+        emoji: "🍬",
+        description: "充滿色彩與無限可能，你擁有獨特的魅力與內在世界。你善於感知他人情緒，並能輕易成為人群中的亮點，但也需要足夠的空間來探索自我。你的存在本身就是一種美好，讓人無法忽視。"
+    },
+    "douhua": {
+        name: "豆花",
+        emoji: "🍮",
+        description: "溫和且富有同理心，你總能帶給周圍的人一種安穩的滋潤。你樂於付出，細膩地關照著每個人，是團體中不可或缺的溫暖力量。你深具包容性，總能融化隔閡，創造和諧的氛圍。"
+    },
+    "toast": {
+        name: "熱壓吐司",
+        emoji: "🥪",
+        description: "務實且可靠，你總能給人帶來實實在在的安全感。你注重結構與秩序，擁有卓越的執行力，能將複雜的事情處理得井井有條。你的存在讓人感到安心，是團隊中值得信賴的基石。"
+    },
+    "coffee": {
+        name: "黑咖啡",
+        emoji: "☕",
+        description: "冷靜而深邃，你擁有獨立思考的習慣與追求本質的渴望。你偏好邏輯與效率，不輕易被表面現象迷惑，總是能洞察事物的核心。你的存在雖然低調，卻蘊含著強大的力量與獨到的見解。"
+    },
+    "popcorn": {
+        name: "爆米花",
+        emoji: "🍿",
+        description: "活潑開朗，充滿感染力的熱情。你總是能為任何場合帶來歡聲笑語，擅長與人互動，享受當下的美好。你的存在充滿了驚喜與活力，讓人情不自禁地被你的樂觀所吸引。"
+    },
+    "marshmallow": {
+        name: "棉花糖",
+        emoji: "☁️",
+        description: "柔軟而敏感，你擁有豐富的內心世界與細膩的情感。你善於感受他人的情緒，並能以獨特的方式表達自我。你的存在本身就是一種溫暖與療癒，總能為周圍帶來一份寧靜與美好。"
+    },
+    "zucchini": {
+        name: "櫛瓜",
+        emoji: "🥒",
+        description: "冷靜務實，你擁有解決問題的獨特天賦與客觀分析的能力。你不喜歡繁瑣，偏好簡潔與效率，總能找到最直接的解決方案。你的存在低調而堅實，是許多複雜情況中的穩定力量。"
+    },
+    "cheesefondue": {
+        name: "起司鍋",
+        emoji: "🫕",
+        description: "充滿力量與決斷力，你天生就是一個引領者。你擁有強烈的目標導向，敢於面對挑戰，並能激勵他人共同前進。你的存在充滿了凝聚力與行動力，是推動事物發展的關鍵人物。"
+    },
+    "sweetpotato": {
+        name: "烤地瓜",
+        emoji: "🍠",
+        description: "溫暖而穩定，你總能帶給人一種踏實可靠的感覺。你內心豐富，善於提供支持與慰藉，並在不經意間給予他人溫暖。你的存在就像冬日裡的暖陽，讓人感到安心與滿足。"
+    }
+};
+
+
+// 全域變數
+let currentQuestionIndex = 0;
+let mbtiScores = {}; // 儲存 E/I, S/N, T/F, J/P 的分數
+let enneagramScores = {}; // 儲存九型人格數字的出現次數
+let userName = ""; // 新增使用者姓名變數
+
+// 取得 DOM 元素
+const welcomeScreen = document.getElementById("welcomeScreen");
+const userNameInput = document.getElementById("userName"); // 新增姓名輸入框
+const quizContainer = document.getElementById("quiz");
+const questionDiv = document.getElementById("question");
+const optionsDiv = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const resultDiv = document.getElementById("result");
+const startButton = document.getElementById("startButton");
+
+// 函數：隨機從陣列中選取 N 個不重複的元素
+function getRandomElements(arr, num) {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+}
+
+// 初始化分數
+function initScores() {
+    mbtiScores = {
+        'E': 0, 'I': 0,
+        'S': 0, 'N': 0,
+        'T': 0, 'F': 0,
+        'J': 0, 'P': 0
+    };
+    enneagramScores = {};
+    resultDiv.innerHTML = ""; // 清空結果區
+    nextBtn.style.display = "none"; // 隱藏下一題按鈕
+}
+
+// 顯示題目與選項
+function showQuestion() {
+    const q = quizData[currentQuestionIndex];
+    questionDiv.textContent = q.question;
+    optionsDiv.innerHTML = ""; // 清空舊選項
+
+    q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.text;
+        btn.onclick = () => selectAnswer(index);
+        optionsDiv.appendChild(btn);
+    });
+
+    nextBtn.style.display = "none"; // 確保下一題按鈕隱藏
+}
+
+// 選擇答案並計分
+function selectAnswer(optionIndex) {
+    const selectedOption = quizData[currentQuestionIndex].options[optionIndex];
+    
+    // 累積 MBTI 分數 (拆解類型代碼)
+    const mbtiType = selectedOption.mbti; // 例如 "ISTJ"
+    if (mbtiType && mbtiType.length === 4) {
+        mbtiScores[mbtiType[0]]++; // I 或 E
+        mbtiScores[mbtiType[1]]++; // S 或 N
+        mbtiScores[mbtiType[2]]++; // T 或 F
+        mbtiScores[mbtiType[3]]++; // J 或 P
+    }
+
+    // 累積九型人格分數
+    const enneagramNum = selectedOption.enneagram;
+    if(enneagramScores[enneagramNum]){
+        enneagramScores[enneagramNum]++;
+    } else {
+        enneagramScores[enneagramNum] = 1;
+    }
+
+    // 禁用所有選項，並標記選中的按鈕
+    for(let btn of optionsDiv.children){
+        btn.disabled = true;
+        btn.classList.remove("selected"); // 移除其他按鈕的選中狀態
+    }
+    optionsDiv.children[optionIndex].classList.add("selected"); // 加上選中狀態
+
+    nextBtn.style.display = "inline-block"; // 顯示下一題按鈕
+}
+
+// 進入下一題或顯示結果
+function nextQuestion() {
+    currentQuestionIndex++;
+    if(currentQuestionIndex < quizData.length){
+        showQuestion();
+    } else {
+        showResult(); // 測驗結束，顯示結果
+    }
+}
+
+// 根據分數計算最終的 MBTI 類型
+function calculateMBTI() {
+    let finalMBTI = "";
+    finalMBTI += (mbtiScores['E'] >= mbtiScores['I']) ? 'E' : 'I';
+    finalMBTI += (mbtiScores['S'] >= mbtiScores['N']) ? 'S' : 'N';
+    finalMBTI += (mbtiScores['T'] >= mbtiScores['F']) ? 'T' : 'F';
+    finalMBTI += (mbtiScores['J'] >= mbtiScores['P']) ? 'J' : 'P';
+    return finalMBTI;
+}
+
+// 根據分數找出九型人格最高分
+function calculateEnneagram() {
+    let maxEnneagram = null;
+    let maxEnneagramScore = -1;
+    for(let num in enneagramScores){
+        if(enneagramScores[num] > maxEnneagramScore){
+            maxEnneagramScore = enneagramScores[num];
+            maxEnneagram = num;
+        }
+    }
+    return maxEnneagram;
+}
+
+// 顯示測驗結果 (結合隨機食物人格和推導出的 MBTI/九型人格)
+function showResult() {
+    quizContainer.style.display = "none"; // 隱藏題目區
+    nextBtn.style.display = "none"; // 隱藏下一題按鈕
+    resultDiv.style.display = "block"; // 顯示結果區
+
+    const finalMBTI = calculateMBTI(); // 根據測驗題目結果
+    const finalEnneagram = calculateEnneagram(); // 根據測驗題目結果
+
+    // 隨機選取一個食物人格
+    const foodKeys = Object.keys(foodPersonalities);
+    const randomFoodKey = foodKeys[Math.floor(Math.random() * foodKeys.length)];
+    const matchedFood = foodPersonalities[randomFoodKey];
+
+    // 從所有食物名稱中排除當前選中的食物，然後隨機選取適合與不適合的
+    const allFoodNames = foodKeys.map(key => foodPersonalities[key].name);
+    const otherFoodNames = allFoodNames.filter(name => name !== matchedFood.name);
+
+    // 隨機選取 2-3 個適合的
+    const suitableFoods = getRandomElements(otherFoodNames, Math.floor(Math.random() * 2) + 2); 
+    // 隨機選取 2-3 個不適合的 (確保不與適合的重複)
+    const unsuitableFoods = getRandomElements(otherFoodNames.filter(name => !suitableFoods.includes(name)), Math.floor(Math.random() * 2) + 2);
+
+    let suitableList = suitableFoods.map(item => `<li>${item}</li>`).join('');
+    let unsuitableList = unsuitableFoods.map(item => `<li>${item}</li>`).join('');
+
+    // 如果某些列表是空的 (理論上不會，但做個保護)
+    if (suitableList === '') suitableList = '<li>所有食物都能和諧相處！</li>';
+    if (unsuitableList === '') unsuitableList = '<li>沒有特別不適合的食物！</li>';
+
+    resultDiv.innerHTML = `
+        <h2>${userName || '你'}是 ${matchedFood.emoji} ${matchedFood.name}！</h2>
+        <p>${matchedFood.description}</p>
+        <p><strong>你的MBTI類型是：</strong> ${finalMBTI}</p>
+        <p><strong>你的九型人格是：</strong> ${finalEnneagram}號</p>
+        <p><strong>適合相處的食物：</strong></p>
+        <ul>${suitableList}</ul>
+        <p><strong>不適合相處的食物：</strong></p>
+        <ul>${unsuitableList}</ul>
+        <p style="margin-top:25px;"><strong>你覺得這個測驗結果符合你嗎？</strong></p>
+        <div class="feedback-buttons">
+            <button onclick="handleFeedback('yes', this, '${matchedFood.name}', '${finalMBTI}', '${finalEnneagram}')">非常符合！</button>
+            <button onclick="handleFeedback('somewhat', this, '${matchedFood.name}', '${finalMBTI}', '${finalEnneagram}')">有點符合</button>
+            <button onclick="handleFeedback('no', this, '${matchedFood.name}', '${finalMBTI}', '${finalEnneagram}')">不太符合</button>
+        </div>
+        <button id="restartBtn" onclick="restartQuiz()">重新測驗</button>
+    `;
+    // 確保重新測驗按鈕顯示在 feedback 按鈕之後
+    document.getElementById("restartBtn").style.display = "inline-block"; 
+}
+
+// 處理回饋 (這裡只是簡單的視覺變化，實際應用需要將數據發送到後端)
+function handleFeedback(feedbackType, buttonElement, foodPersonality, mbtiType, enneagramType) {
+    const feedbackButtons = document.querySelector('.feedback-buttons');
+    for (let btn of feedbackButtons.children) {
+        btn.classList.remove('active');
+        btn.disabled = true; // 選擇後禁用所有回饋按鈕
+    }
+    buttonElement.classList.add('active'); // 標記被選擇的按鈕
+    
+    // 準備要發送的數據，包含 userName
+    const dataToSend = {
+        userName: userName, // 新增姓名
+        foodPersonality: foodPersonality,
+        mbtiType: mbtiType,
+        enneagramType: enneagramType,
+        feedback: feedbackType 
+    };
+
+    // **重要：請將 'YOUR_BACKEND_API_URL' 替換為您實際部署的後端 API 網址**
+    // 例如：'https://your-food-quiz-backend.onrender.com/api/feedback'
+    const backendApiUrl = 'YOUR_BACKEND_API_URL/api/feedback'; 
+
+    fetch(backendApiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            // 如果 HTTP 狀態碼不是 2xx (例如 404, 500)
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('後端回傳:', data);
+        // 您可以在這裡給使用者一個成功的提示，或在控制台顯示
+    })
+    .catch((error) => {
+        console.error('發送回饋失敗:', error);
+        // 可以顯示一個更友好的失敗訊息，而非彈窗
+    });
+}
+
+// 重新測驗
+function restartQuiz() {
+    currentQuestionIndex = 0;
+    initScores(); // 重置分數
+    userNameInput.value = ""; // 清空姓名輸入框
+    userName = ""; // 重置姓名變數
+    welcomeScreen.style.display = "flex"; // 回到歡迎頁
+    quizContainer.style.display = "none"; // 隱藏題目區
+    resultDiv.style.display = "none"; // 隱藏結果區
+    nextBtn.style.display = "none"; // 隱藏下一題按鈕
+}
+
+// 開始測驗 (點擊按鈕後，獲取姓名並進入第一道問題)
+startButton.addEventListener('click', () => {
+    userName = userNameInput.value.trim(); // 獲取姓名並去除空白
+    
+    welcomeScreen.style.display = "none"; // 隱藏歡迎頁
+    quizContainer.style.display = "block"; // 顯示測驗區
+    initScores(); // 確保分數重置
+    showQuestion(); // 開始顯示第一道題
+});
+
+// 頁面載入時執行
+window.onload = () => {
+    // 初始狀態：只顯示歡迎頁
+    welcomeScreen.style.display = "flex";
+    quizContainer.style.display = "none";
+    resultDiv.style.display = "none"; // 預設隱藏結果區
+};
+</script>
+</body>
+</html>
