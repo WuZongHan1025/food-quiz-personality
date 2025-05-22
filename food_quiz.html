@@ -1281,7 +1281,7 @@
         function saveResultImage() {
             const resultElement = document.getElementById('result-container');
             
-            // 儲存原始樣式
+            // 儲存原始樣式 (這部分保留，用於截圖時的樣式調整)
             const originalContainerPadding = document.querySelector('.container').style.padding;
             const originalContainerShadow = document.querySelector('.container').style.boxShadow;
             const originalContainerBeforeMask = document.querySelector('.container').style.getPropertyValue('-webkit-mask');
@@ -1303,22 +1303,83 @@
             document.querySelector('.container').style.setProperty('-webkit-mask', 'none'); // 移除漸變邊框
             document.querySelector('.container').style.setProperty('mask-composite', 'unset');
 
+            // 顯示一個載入提示
+            const loadingMessage = document.createElement('div');
+            loadingMessage.textContent = '圖片生成中，請稍候...';
+            loadingMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0,0,0,0.7); color: white; padding: 15px 25px; border-radius: 10px; z-index: 1000;';
+            document.body.appendChild(loadingMessage);
+
+
             html2canvas(resultElement, {
                 useCORS: true,
                 allowTaint: true,
-                scale: 2, // 提高解析度以獲得更清晰的圖片
-                backgroundColor: null // 讓背景透明，以便於在有背景的 body 上截圖
+                scale: 2, // 保持此設定，可以嘗試提高到3如果品質不夠
+                backgroundColor: null // 讓背景透明
             }).then(canvas => {
+                // 移除載入提示
+                document.body.removeChild(loadingMessage);
+
                 const dataURL = canvas.toDataURL('image/png');
-                const downloadLink = document.createElement('a');
-                downloadLink.href = dataURL;
-                downloadLink.download = `${userName ? userName + '_' : ''}我的食物人格測驗結果_${new Date().toLocaleDateString().replace(/\//g, '-')}.png`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+
+                // 創建一個新的圖片元素來顯示結果
+                const img = document.createElement('img');
+                img.src = dataURL;
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.style.display = 'block'; // 確保圖片顯示
+
+                // 移除原有的結果頁內容，顯示圖片
+                resultElement.innerHTML = ''; // 清空結果容器
+                resultElement.appendChild(img); // 將圖片添加到結果容器
+
+                // 添加儲存提示和操作按鈕
+                const savePrompt = document.createElement('p');
+                savePrompt.innerHTML = '<br><strong>✨ 圖片已生成！</strong><br>在手機上請「長按圖片」儲存或分享。<br>在電腦上可右鍵另存圖片。';
+                savePrompt.style.cssText = 'margin-top: 20px; font-size: 1.1em; color: var(--text-dark); line-height: 1.6;';
+                resultElement.appendChild(savePrompt);
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = 'display: flex; justify-content: center; gap: 15px; margin-top: 20px;';
+
+                const downloadBtn = document.createElement('a'); // 仍然提供下載按鈕作為備用
+                downloadBtn.href = dataURL;
+                downloadBtn.download = `${userName ? userName + '_' : ''}我的食物人格測驗結果_${new Date().toLocaleDateString().replace(/\//g, '-')}.png`;
+                downloadBtn.textContent = '點擊下載圖片 (備用)';
+                downloadBtn.className = 'stage-nav-btn'; // 使用現有按鈕樣式
+                downloadBtn.style.background = 'linear-gradient(45deg, #1976D2, #2196F3)'; // 藍色系
+                downloadBtn.style.maxWidth = '200px'; // 限制寬度
+                downloadBtn.style.margin = '0 auto'; // 置中
+                downloadBtn.target = '_blank'; // 開啟新分頁下載，某些瀏覽器支援
+                
+                // 重新測驗按鈕
+                const restartBtn = document.createElement('button');
+                restartBtn.textContent = '重新測驗';
+                restartBtn.id = 'restartQuizBtnNew'; // 確保ID不衝突
+                restartBtn.className = 'stage-nav-btn';
+                restartBtn.style.background = 'linear-gradient(45deg, #FF5722, #FF8A00)'; // 橙色系
+                restartBtn.style.maxWidth = '200px';
+                restartBtn.style.margin = '0 auto';
+                restartBtn.addEventListener('click', restartQuiz); // 綁定重新測驗函數
+
+                buttonContainer.appendChild(downloadBtn);
+                buttonContainer.appendChild(restartBtn);
+                resultElement.appendChild(buttonContainer);
+
+
+                // 移除原有的儲存圖片按鈕和回饋按鈕，避免重複
+                const oldSaveBtn = document.getElementById('saveResultImage');
+                if(oldSaveBtn) oldSaveBtn.remove();
+                const oldRestartBtn = document.getElementById('restartQuizBtn');
+                if(oldRestartBtn) oldRestartBtn.remove();
+                const oldFeedbackSection = document.getElementById('feedback-section');
+                if(oldFeedbackSection) oldFeedbackSection.remove();
+
+
             }).catch(error => {
+                // 移除載入提示
+                document.body.removeChild(loadingMessage);
                 console.error("圖片儲存失敗：", error);
-                alert("圖片儲存失敗，請重試或檢查瀏覽器權限。");
+                alert("圖片生成失敗，請重試或檢查瀏覽器權限。\n錯誤訊息: " + error.message);
             }).finally(() => {
                 // 恢復原始樣式
                 document.body.style.overflow = originalBodyOverflow;
@@ -1327,6 +1388,10 @@
                 document.querySelector('.container').style.setProperty('-webkit-mask', originalContainerBeforeMask);
                 document.querySelector('.container').style.setProperty('mask-composite', originalContainerBeforeMaskComposite);
                 
+                // 注意：這裡不再恢復 feedbackSection 的 display，因為它已經被 remove() 了
+                // 如果需要，可以在 catch 塊中恢復它，或者在顯示圖片後，重新建立 feedbackSection
+            });
+        }                
                 // 恢復回饋區塊顯示
                 feedbackSection.style.display = feedbackSectionDisplay;
             });
