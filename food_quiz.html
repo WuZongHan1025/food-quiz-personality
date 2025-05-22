@@ -1201,51 +1201,1010 @@
                 unsuitableFoodsList.innerHTML = '<li>目前沒有特別需要多點理解的食物。</li>';
             }
 
-            // 設置回饋按鈕的事件監聽器
-            const feedbackButtons = document.querySelectorAll('.feedback-buttons button');
-            feedbackButtons.forEach(button => {
-                // 移除舊的 event listener 以避免重複觸發
-                const oldOnClick = button.getAttribute('onclick');
-                if (oldOnClick) {
-                    button.removeAttribute('onclick');
-                    button.removeEventListener('click', (event) => {
-                        handleFeedback(event.target.dataset.feedback, event.target, matchedFood.name, finalMBTI, finalEnneagram);
-                    });
-                }
-                // 重設按鈕狀態
-                button.classList.remove('active');
-                button.disabled = false;
+            <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你的專屬食物人格測驗</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #FF6B6B; /* Soft Red */
+            --secondary-color: #4ECDC4; /* Teal */
+            --accent-color: #FFE66D; /* Yellow */
+            --background-light: #F7FFF7; /* Off-white */
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+            --border-radius: 12px;
+            --button-hover-scale: 1.03;
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --gradient-start: #FF9A8B;
+            --gradient-end: #FF6A88;
+        }
 
-                // 添加新的 event listener
-                button.addEventListener('click', (event) => {
-                    handleFeedback(event.target.dataset.feedback, event.target, matchedFood.name, finalMBTI, finalEnneagram);
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            background-color: var(--background-light);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle white border */
+            -webkit-mask: 
+                linear-gradient(to right, transparent, black 10%, black 90%, transparent) 0% 0% / 100% 100%,
+                linear-gradient(to bottom, transparent, black 10%, black 90%, transparent) 0% 0% / 100% 100%;
+            mask-composite: intersect;
+            -webkit-mask-composite: destination-in; /* For older WebKit */
+        }
+
+        h1 {
+            font-family: 'Permanent Marker', cursive;
+            color: var(--primary-color);
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 5px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .input-group input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            color: var(--text-dark);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+            outline: none;
+        }
+
+        .button {
+            background: linear-gradient(45deg, var(--primary-color), #FF4F78);
+            color: var(--text-light);
+            padding: 15px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button:hover {
+            transform: scale(var(--button-hover-scale));
+            box-shadow: var(--shadow-medium);
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .quiz-container {
+            padding-top: 20px;
+        }
+
+        .stage-intro {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #555;
+            background-color: rgba(var(--accent-color), 0.1);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--accent-color);
+            text-align: left;
+            line-height: 1.8;
+            font-weight: bold;
+        }
+
+        .question-block {
+            background-color: #FFFFFF;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            border: 1px solid #eee;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            padding: 12px 18px;
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            font-weight: 400;
+        }
+
+        .option-btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(45deg, var(--primary-color), #FF4F78);
+            color: var(--text-light);
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .stage-nav-btn {
+            flex: 1;
+            padding: 14px 25px;
+            font-size: 1.15em;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-light);
+            background: linear-gradient(45deg, var(--secondary-color), #3AB7BF);
+            box-shadow: var(--shadow-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .stage-nav-btn:hover {
+            transform: scale(var(--button-hover-scale));
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stage-nav-btn[data-direction="result"] {
+            background: linear-gradient(45deg, var(--primary-color), #FF4F78);
+        }
+
+        .result-container {
+            padding-top: 20px;
+        }
+
+        .result-container h2 {
+            font-size: 2.2em;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background-color: #FFFFFF;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 30px;
+            text-align: left;
+            border: 1px solid #eee;
+        }
+
+        .result-card h3 {
+            font-size: 1.6em;
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .result-card p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        .result-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .result-card ul li {
+            background-color: rgba(var(--secondary-color), 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 1em;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .result-card ul li strong {
+            color: var(--primary-color);
+        }
+
+        .result-disclaimer {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 30px;
+            line-height: 1.5;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px dashed #ddd;
+            text-align: left;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-buttons button {
+            background-color: #f0f0f0;
+            color: #666;
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .feedback-buttons button:hover {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+        }
+
+        .feedback-buttons button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+        }
+
+        .feedback-buttons button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .button, .stage-nav-btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .option-btn {
+                font-size: 0.95em;
+                padding: 10px 15px;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .stage-nav-btn {
+                width: 100%;
+            }
+
+            .result-card h3 {
+                font-size: 1.4em;
+            }
+
+            .result-card p, .result-card ul li {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>探索你的食物人格！</h1>
+
+        <div id="intro-container">
+            <p style="font-size: 1.1em; color: #666; margin-bottom: 25px;">這是一個結合MBTI與九型人格的趣味測驗，透過你的選擇，探索最符合你的「食物人格」！</p>
+            <div class="input-group">
+                <label for="userNameInput">輸入你的暱稱 (選填):</label>
+                <input type="text" id="userNameInput" placeholder="例如：美食家小李">
+            </div>
+            <button id="startQuizBtn" class="button">開始測驗</button>
+            <div id="intro-disclaimer" class="result-disclaimer">
+                <p><strong>免責聲明：</strong>本測驗為趣味性質，結果僅供參考與娛樂，不具備專業心理學診斷效力。人格特質複雜多樣，請以開放的心態看待結果，並享受測驗過程！</p>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="hidden">
+            <div id="current-stage-content">
+                </div>
+            <div class="navigation-buttons">
+                <button id="prevStageBtn" class="stage-nav-btn hidden" data-direction="prev">上一階段</button>
+                <button id="nextStageBtn" class="stage-nav-btn" data-direction="next">下一階段</button>
+            </div>
+        </div>
+
+        <div id="result-container" class="hidden">
+            <h2 id="result-title"></h2>
+            <div class="result-card">
+                <h3>你的專屬食物人格是：</h3>
+                <p id="final-food-personality" style="font-size: 1.8em; font-weight: bold; color: var(--primary-color); margin-bottom: 15px;"></p>
+                <p id="food-personality-description" style="font-size: 1.2em; color: #555; line-height: 1.8;"></p>
+            </div>
+
+            <div class="result-card">
+                <h3>最適合與你搭配的食物夥伴們：</h3>
+                <ul id="suitable-foods-with-reason">
+                    </ul>
+            </div>
+
+            <div class="result-card">
+                <h3>需要多點理解的食物們 (可能需要時間磨合哦)：</h3>
+                <ul id="unsuitable-foods-with-reason">
+                    </ul>
+            </div>
+
+            <div id="feedback-section">
+                <h3>測驗結果準嗎？給我們回饋吧！</h3>
+                <div class="feedback-buttons">
+                    <button data-feedback="accurate">超準！</button>
+                    <button data-feedback="neutral">還行</button>
+                    <button data-feedback="inaccurate">不太準</button>
+                </div>
+            </div>
+            
+            <button id="saveResultImageBtn" class="button" style="background: linear-gradient(45deg, #FFD700, #FFA500);">生成結果圖片</button>
+            <button id="restartQuizBtn" class="button" style="background: linear-gradient(45deg, #6c757d, #495057); margin-top: 15px;">重新測驗</button>
+
+            <div id="result-disclaimer" class="result-disclaimer">
+                <p><strong>免責聲明：</strong>本測驗為趣味性質，結果僅供參考與娛樂，不具備專業心理學診斷效力。人格特質複雜多樣，請以開放的心態看待結果，並享受測驗過程！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const nextStageBtn = document.getElementById('nextStageBtn');
+        const prevStageBtn = document.getElementById('prevStageBtn');
+        const restartQuizBtn = document.getElementById('restartQuizBtn'); // Initial restart button
+        const saveResultImageBtn = document.getElementById('saveResultImageBtn');
+        const userNameInput = document.getElementById('userNameInput');
+        
+        const introContainer = document.getElementById('intro-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const currentStageContent = document.getElementById('current-stage-content');
+        const introDisclaimer = document.getElementById('intro-disclaimer');
+        const resultDisclaimer = document.getElementById('result-disclaimer');
+
+        // Global Variables
+        let userName = '';
+        let currentStageIndex = 0;
+        let userAnswers = {}; // Stores {globalQuestionIndex: selectedOptionIndex}
+        let mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        let enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+
+        // Define your quiz stages and questions here
+        // Example structure (you'll replace this with your actual data)
+        const stages = [
+            {
+                intro: "<h3>第一階段：你的日常能量來源</h3><p>你更傾向於從哪裡獲得能量？</p>",
+                questions: [
+                    {
+                        question: "當你需要充電時，你會：",
+                        options: [
+                            { text: "參加熱鬧的聚會，與朋友暢聊。", scores: { mbti: { E: 1 }, enneagram: { 7: 1 } } },
+                            { text: "獨自一人，享受安靜的時光，例如閱讀或冥想。", scores: { mbti: { I: 1 }, enneagram: { 5: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "在一個派對上，你通常是：",
+                        options: [
+                            { text: "活躍的交流者，結識新朋友。", scores: { mbti: { E: 1 }, enneagram: { 3: 1 } } },
+                            { text: "觀察者，與熟悉的朋友深入交談。", scores: { mbti: { I: 1 }, enneagram: { 9: 1 } } }
+                        ]
+                    }
+                ]
+            },
+            {
+                intro: "<h3>第二階段：你的資訊處理方式</h3><p>你更注重實際細節還是抽象概念？</p>",
+                questions: [
+                    {
+                        question: "面對新資訊，你更傾向於：",
+                        options: [
+                            { text: "關注具體的數據、事實和細節。", scores: { mbti: { S: 1 }, enneagram: { 1: 1 } } },
+                            { text: "探索背後的意義、模式和可能性。", scores: { mbti: { N: 1 }, enneagram: { 4: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "描述一棵樹時，你會：",
+                        options: [
+                            { text: "具體描述它的葉子形狀、樹皮紋理和高度。", scores: { mbti: { S: 1 }, enneagram: { 6: 1 } } },
+                            { text: "聯想到它作為生態系統的支撐，或它在不同季節的象徵意義。", scores: { mbti: { N: 1 }, enneagram: { 7: 1 } } }
+                        ]
+                    }
+                ]
+            },
+            {
+                intro: "<h3>第三階段：你的決策模式</h3><p>你做決定時更傾向於邏輯分析還是人際和諧？</p>",
+                questions: [
+                    {
+                        question: "做重要決定時，你通常會：",
+                        options: [
+                            { text: "客觀分析利弊，重視邏輯和效率。", scores: { mbti: { T: 1 }, enneagram: { 8: 1 } } },
+                            { text: "考慮對他人的影響，重視價值觀和情感。", scores: { mbti: { F: 1 }, enneagram: { 2: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "在衝突中，你更傾向於：",
+                        options: [
+                            { text: "找出問題的根源並尋求理性解決方案。", scores: { mbti: { T: 1 }, enneagram: { 1: 1 } } },
+                            { text: "關注維護關係和理解他人的感受。", scores: { mbti: { F: 1 }, enneagram: { 9: 1 } } }
+                        ]
+                    }
+                ]
+            },
+            {
+                intro: "<h3>第四階段：你的生活態度</h3><p>你喜歡有計劃還是隨性而為？</p>",
+                questions: [
+                    {
+                        question: "對於即將到來的週末，你傾向於：",
+                        options: [
+                            { text: "提前規劃好所有活動和時間表。", scores: { mbti: { J: 1 }, enneagram: { 1: 1 } } },
+                            { text: "保持開放，隨時根據心情和機會做決定。", scores: { mbti: { P: 1 }, enneagram: { 7: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "你的工作空間通常是：",
+                        options: [
+                            { text: "整潔有序，所有物品都有固定位置。", scores: { mbti: { J: 1 }, enneagram: { 6: 1 } } },
+                            { text: "充滿靈活性，物品可能隨處可見，但你知道它們在哪。", scores: { mbti: { P: 1 }, enneagram: { 5: 1 } } }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Define food personalities (replace with your actual data)
+        const foodPersonalities = {
+            popcorn: { 
+                name: "爆米花", 
+                emoji: "🍿",
+                description: "你是充滿活力和社交魅力的爆米花！你熱愛自由，喜歡在人群中成為焦點，總能帶來歡樂和輕鬆的氛圍。你的適應力強，樂於接受新事物，生活對你來說就是一場場精彩的派對。"
+            },
+            blackCoffee: { 
+                name: "黑咖啡", 
+                emoji: "☕",
+                description: "你是深邃而獨立的黑咖啡。你注重深度和本質，喜歡獨自思考，追求知識和真理。你可能不善言辭，但內心豐富，一旦認定目標便會專注投入。你珍視清晰與效率，討厭冗餘與膚淺。"
+            },
+            tofuPudding: { 
+                name: "豆花", 
+                emoji: "🍮",
+                description: "你是溫潤如玉的豆花。你善良、溫和，富有同情心，總是樂於幫助他人。你追求和諧與內心的平靜，不喜歡衝突，是朋友圈中的潤滑劑。你細膩的情感讓你能夠敏銳地感知他人的需求。"
+            },
+            grilledCheeseSandwich: { 
+                name: "起司烤三明治", 
+                emoji: "🥪",
+                description: "你是溫暖而可靠的起司烤三明治。你務實、可靠，腳踏實地，是解決問題的高手。你重視傳統和穩定，喜歡將事情做得有條不紊。你對親近的人充滿忠誠，是值得信賴的依靠。"
+            },
+            macaron: { 
+                name: "馬卡龍", 
+                emoji: " macarons",
+                description: "你是色彩繽紛、充滿創意的馬卡龍。你擁有豐富的想像力和獨特的審美，不喜歡墨守成規。你追求個人表達，情感豐富且複雜，總能在平凡中發現不凡之美。你渴望被理解，也樂於探索新奇。"
+            },
+            cheeseFondue: { 
+                name: "起司火鍋", 
+                emoji: "🧀",
+                description: "你是充滿力量和掌控慾的起司火鍋。你自信、果斷，有強烈的領導慾和保護欲。你喜歡挑戰，不畏困難，願意為自己和在乎的人奮鬥。你直接且坦率，有時可能顯得強勢，但內心卻充滿熱情。"
+            },
+            roastedSweetPotato: { 
+                name: "烤地瓜", 
+                emoji: "🍠",
+                description: "你是樸實而忠誠的烤地瓜。你穩重、負責，重視安全感和歸屬感。你可能有些謹慎，但一旦信任便會全心投入。你勤懇踏實，是個可靠的盟友，總能在危難時刻給予支持。"
+            },
+            cottonCandy: { 
+                name: "棉花糖", 
+                emoji: "🍬",
+                description: "你是輕盈而夢幻的棉花糖。你追求內心的和諧與寧靜，喜歡簡單和舒適的生活。你傾向於避免衝突，擅長協調與包容。你可能有些隨性，但總是給人帶來輕鬆愉快的感覺。"
+            },
+            zucchini: { 
+                name: "櫛瓜", 
+                emoji: "🥒",
+                description: "你是清爽而內斂的櫛瓜。你喜歡保持獨立，不愛張揚，注重內在的成長和自我完善。你觀察力敏銳，善於分析，有著獨特的視角。你對新知充滿好奇，是個不斷學習的探究者。"
+            }
+        };
+        const allFoodKeys = Object.keys(foodPersonalities);
+
+
+        // Event Listeners
+        startQuizBtn.addEventListener('click', startQuiz);
+        nextStageBtn.addEventListener('click', navigateStage);
+        prevStageBtn.addEventListener('click', navigateStage);
+        restartQuizBtn.addEventListener('click', restartQuiz);
+        saveResultImageBtn.addEventListener('click', saveResultImage);
+
+        // Start Quiz
+        function startQuiz() {
+            userName = userNameInput.value.trim();
+            
+            introContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            introDisclaimer.classList.add('hidden'); // Hide intro disclaimer
+
+            currentStageIndex = 0;
+            userAnswers = {}; // Reset all answers
+            mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+            renderStage();
+            window.scrollTo(0, 0); // Scroll to top
+        }
+
+        // Render current stage's questions and options
+        function renderStage() {
+            const currentStage = stages[currentStageIndex];
+            currentStageContent.innerHTML = ''; // Clear old content
+
+            // Add stage intro
+            const introDiv = document.createElement('div');
+            introDiv.classList.add('stage-intro');
+            introDiv.innerHTML = currentStage.intro;
+            currentStageContent.appendChild(introDiv);
+
+            // Iterate through all questions in the current stage
+            currentStage.questions.forEach((qData, qIndexInStage) => {
+                // Calculate the global index of this question in the total `questions` list
+                const questionGlobalIndex = getQuestionGlobalIndex(currentStageIndex, qIndexInStage);
+
+                const questionBlock = document.createElement('div');
+                questionBlock.classList.add('question-block');
+
+                const qText = document.createElement('p');
+                qText.classList.add('question-text');
+                qText.innerHTML = qData.question;
+                questionBlock.appendChild(qText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options-container');
+
+                qData.options.forEach((option, optionIndex) => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-btn');
+                    button.innerText = option.text;
+                    // Store global question index and option index
+                    button.dataset.questionGlobalIndex = questionGlobalIndex;
+                    button.dataset.optionIndex = optionIndex;
+                    button.dataset.mbti = JSON.stringify(option.scores.mbti);
+                    button.dataset.enneagram = JSON.stringify(option.scores.enneagram);
+
+                    // If this question was previously answered, mark it as selected
+                    if (userAnswers[questionGlobalIndex] === optionIndex) {
+                        button.classList.add('selected');
+                    }
+
+                    button.addEventListener('click', selectOption);
+                    optionsDiv.appendChild(button);
+                });
+                questionBlock.appendChild(optionsDiv);
+                currentStageContent.appendChild(questionBlock);
+            });
+
+            updateNavigationButtons();
+            window.scrollTo(0, 0); // Scroll to top every time a new stage is rendered
+        }
+
+        // Display and functionality of navigation buttons
+        function updateNavigationButtons() {
+            // Previous stage button
+            if (currentStageIndex === 0) {
+                prevStageBtn.classList.add('hidden');
+            } else {
+                prevStageBtn.classList.remove('hidden');
+                prevStageBtn.innerText = '上一階段';
+                prevStageBtn.dataset.direction = 'prev';
+            }
+
+            // Next stage/View Result button
+            if (currentStageIndex === stages.length - 1) {
+                nextStageBtn.innerText = '查看結果';
+                nextStageBtn.dataset.direction = 'result';
+            } else {
+                nextStageBtn.innerText = '下一階段';
+                nextStageBtn.dataset.direction = 'next';
+            }
+            nextStageBtn.classList.remove('hidden'); // Ensure next stage button is always visible
+        }
+
+        // Option click event
+        function selectOption(event) {
+            const clickedButton = event.target;
+            const questionGlobalIndex = parseInt(clickedButton.dataset.questionGlobalIndex);
+            const optionIndex = parseInt(clickedButton.dataset.optionIndex);
+
+            // Get all option buttons for the current question
+            const optionsContainer = clickedButton.closest('.options-container');
+            const allOptionButtons = Array.from(optionsContainer.children);
+
+            // If the clicked option is already selected, unselect it
+            if (clickedButton.classList.contains('selected')) {
+                clickedButton.classList.remove('selected');
+                delete userAnswers[questionGlobalIndex]; // Remove this question from answers
+            } else {
+                // Otherwise, unselect other options
+                allOptionButtons.forEach(btn => btn.classList.remove('selected'));
+                // Select the currently clicked option
+                clickedButton.classList.add('selected');
+                // Store user's answer
+                userAnswers[questionGlobalIndex] = optionIndex;
+            }
+        }
+
+        // Navigation logic (Next Stage/Previous Stage/View Result)
+        function navigateStage(event) {
+            const direction = event.target.dataset.direction;
+
+            if (direction === 'prev') {
+                currentStageIndex--;
+                renderStage();
+            } else {
+                // Before moving to the next stage or showing results, check if all questions in the current stage are answered
+                const currentStageQuestions = stages[currentStageIndex].questions;
+                let allAnswered = true;
+                for (let i = 0; i < currentStageQuestions.length; i++) {
+                    const globalIndex = getQuestionGlobalIndex(currentStageIndex, i);
+                    if (userAnswers[globalIndex] === undefined) {
+                        allAnswered = false;
+                        break;
+                    }
+                }
+
+                if (!allAnswered) {
+                    alert('請回答本階段所有問題後再進入下一階段！');
+                    return;
+                }
+
+                if (direction === 'next') {
+                    currentStageIndex++;
+                    renderStage();
+                } else if (direction === 'result') {
+                    calculateAndShowResult();
+                }
+            }
+        }
+
+        // Recalculate all scores based on user answers
+        function recalculateScores() {
+            // Reset all scores
+            mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+
+            // Iterate through all questions in all stages and accumulate scores based on userAnswers
+            let globalQuestionCounter = 0;
+            stages.forEach(stage => {
+                stage.questions.forEach((qData) => {
+                    const selectedOptionIndex = userAnswers[globalQuestionCounter];
+                    if (selectedOptionIndex !== undefined) {
+                        const selectedOption = qData.options[selectedOptionIndex];
+                        // Accumulate MBTI scores
+                        const mbtiImpact = selectedOption.scores.mbti;
+                        for (const char in mbtiImpact) {
+                            mbtiScores[char] += mbtiImpact[char];
+                        }
+                        // Accumulate Enneagram scores
+                        const enneagramImpact = selectedOption.scores.enneagram;
+                        for (const type in enneagramImpact) {
+                            enneagramScores[type] += enneagramImpact[type];
+                        }
+                    }
+                    globalQuestionCounter++;
                 });
             });
         }
 
-        // 重新測驗
-        function restartQuiz() {
-            resultContainer.classList.add('hidden');
-            introContainer.classList.remove('hidden');
-            introDisclaimer.classList.remove('hidden'); // 確保重新開始時首頁免責聲明顯示
-            resultDisclaimer.classList.add('hidden'); // 隱藏結果頁免責聲明
-
-            currentStageIndex = 0;
-            userAnswers = {};
-            userNameInput.value = ''; // 清空姓名欄
-            userName = ''; // 清空姓名變數
-            mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-            window.scrollTo(0, 0); // 捲動到頁面頂部
+        // Helper function: Get global index of a question
+        function getQuestionGlobalIndex(stageIndex, questionIndexInStage) {
+            let globalIndex = 0;
+            for (let i = 0; i < stageIndex; i++) {
+                globalIndex += stages[i].questions.length;
+            }
+            globalIndex += questionIndexInStage;
+            return globalIndex;
         }
 
-        // 輔助函數：從陣列中隨機選取 N 個不重複的元素
+        // Calculate final MBTI type
+        function calculateMBTI() {
+            let mbtiType = "";
+            mbtiType += (mbtiScores.E >= mbtiScores.I) ? 'E' : 'I';
+            mbtiType += (mbtiScores.S >= mbtiScores.N) ? 'S' : 'N';
+            mbtiType += (mbtiScores.T >= mbtiScores.F) ? 'T' : 'F';
+            mbtiType += (mbtiScores.J >= mbtiScores.P) ? 'J' : 'P';
+            return mbtiType;
+        }
+
+        // Calculate final Enneagram type
+        function calculateEnneagram() {
+            let maxScore = -1;
+            let finalEnneagramType = '未知';
+
+            const enneagramEntries = Object.entries(enneagramScores);
+
+            // Sort by score in descending order, if scores are equal, sort by type number in ascending order (e.g., 1 before 7)
+            enneagramEntries.sort((a, b) => {
+                if (b[1] === a[1]) {
+                    return parseInt(a[0]) - parseInt(b[0]); // If scores are equal, smaller number takes precedence
+                }
+                return b[1] - a[1]; // Higher score takes precedence
+            });
+
+            if (enneagramEntries.length > 0) {
+                finalEnneagramType = enneagramEntries[0][0]; // Take the type with the highest score (or smallest number among tied highest)
+            }
+
+            return finalEnneagramType + '號';
+        }
+
+        // Display results
+        function calculateAndShowResult() {
+            recalculateScores(); // Recalculate all scores before displaying results
+
+            quizContainer.classList.add('hidden');
+            introDisclaimer.classList.add('hidden'); // Hide intro disclaimer
+            resultContainer.classList.remove('hidden'); // Show result page (including its internal disclaimer)
+            window.scrollTo(0, 0); // Scroll to top
+
+            const finalMBTI = calculateMBTI();
+            const finalEnneagram = calculateEnneagram();
+            console.log("最終 MBTI 類型: ", finalMBTI);
+            console.log("最終九型人格類型: ", finalEnneagram);
+            console.log("MBTI 原始分數: ", mbtiScores);
+            console.log("九型人格原始分數: ", enneagramScores);
+
+            let finalFoodPersonalityKey;
+
+            // More complex food personality determination logic, combining MBTI and Enneagram tendencies
+            // More conditions can be added here to make the results more precise and interesting
+            // Example:
+            if (mbtiScores.E > mbtiScores.I && enneagramScores[7] > enneagramScores[4]) {
+                finalFoodPersonalityKey = 'popcorn'; // Extroverted, pleasure-seeking
+            } else if (mbtiScores.I > mbtiScores.E && enneagramScores[5] > enneagramScores[1]) {
+                finalFoodPersonalityKey = 'blackCoffee'; // Introverted, analytical, seeking knowledge
+            } else if (mbtiScores.F > mbtiScores.T && enneagramScores[2] > enneagramScores[9]) {
+                finalFoodPersonalityKey = 'tofuPudding'; // Emotional, helpful, gentle
+            } else if (mbtiScores.S > mbtiScores.N && enneagramScores[1] > enneagramScores[8]) {
+                finalFoodPersonalityKey = 'grilledCheeseSandwich'; // Practical, pragmatic, reliable
+            } else if (mbtiScores.N > mbtiScores.S && enneagramScores[4] > enneagramScores[7]) {
+                finalFoodPersonalityKey = 'macaron'; // Intuitive, unique, creative
+            } else if (enneagramScores[8] > enneagramScores[3] && mbtiScores.T > mbtiScores.F) {
+                finalFoodPersonalityKey = 'cheeseFondue'; // Controlling, powerful, more thinking-oriented
+            } else if (enneagramScores[6] > enneagramScores[9] && mbtiScores.J > mbtiScores.P) {
+                finalFoodPersonalityKey = 'roastedSweetPotato'; // Loyal, seeking security, more judging-oriented
+            } else if (enneagramScores[9] > enneagramScores[6] && mbtiScores.F > mbtiScores.T) {
+                finalFoodPersonalityKey = 'cottonCandy'; // Peaceful, conflict-avoidant, more feeling-oriented
+            } else if (mbtiScores.I > mbtiScores.E && mbtiScores.T > mbtiScores.F && enneagramScores[5] > enneagramScores[9]) {
+                finalFoodPersonalityKey = 'zucchini'; // Introverted, thinking, observer
+            } else {
+                // As a last resort fallback, if no clear match, determine based on MBTI main tendency and Enneagram secondary tendency
+                // This part can be further refined to ensure all combinations fall into a food personality
+                if (finalMBTI.includes('E') && finalMBTI.includes('P')) {
+                    finalFoodPersonalityKey = 'popcorn'; // Extroverted, perceiving, loves freedom
+                } else if (finalMBTI.includes('I') && finalMBTI.includes('J')) {
+                    finalFoodPersonalityKey = 'blackCoffee'; // Introverted, judging, calm and rational
+                } else if (finalMBTI.includes('F') && finalMBTI.includes('S')) {
+                    finalFoodPersonalityKey = 'tofuPudding'; // Feeling, sensing, gentle and considerate
+                } else if (finalMBTI.includes('T') && finalMBTI.includes('N')) {
+                    finalFoodPersonalityKey = 'zucchini'; // Thinking, intuitive, analytical depth
+                } else if (finalMBTI.includes('E') && finalMBTI.includes('J')) {
+                    finalFoodPersonalityKey = 'cheeseFondue'; // Extroverted, judging, organized
+                } else if (finalMBTI.includes('I') && finalMBTI.includes('P')) {
+                    finalFoodPersonalityKey = 'cottonCandy'; // Introverted, perceiving, casual and dreamy
+                } else {
+                    // As a final fallback, if no clear match, randomly assign
+                    const keys = Object.keys(foodPersonalities);
+                    finalFoodPersonalityKey = keys[Math.floor(Math.random() * keys.length)];
+                }
+            }
+
+            const matchedFood = foodPersonalities[finalFoodPersonalityKey];
+            if (!matchedFood) {
+                console.error("未找到對應的食物人格！錯誤的 key:", finalFoodPersonalityKey);
+                document.getElementById('final-food-personality').innerText = "Oooops! 發生錯誤了！";
+                document.getElementById('food-personality-description').innerText = "請稍後再試。";
+                return;
+            }
+
+            document.getElementById('final-food-personality').innerHTML = `<span class="emoji">${matchedFood.emoji}</span> ${matchedFood.name}`;
+            document.getElementById('food-personality-description').innerText = matchedFood.description;
+
+            const otherFoodKeys = allFoodKeys.filter(key => key !== finalFoodPersonalityKey);
+            const suitableFoodsKeys = getRandomElements(otherFoodKeys, Math.floor(Math.random() * 2) + 2); // 2 to 3
+            const remainingFoodKeysForUnsuitable = otherFoodKeys.filter(key => !suitableFoodsKeys.includes(key));
+            const unsuitableFoodsKeys = getRandomElements(remainingFoodKeysForUnsuitable, Math.floor(Math.random() * 2) + 2); // 2 to 3
+
+            const suitableFoodsList = document.getElementById('suitable-foods-with-reason');
+            suitableFoodsList.innerHTML = '';
+            if (suitableFoodsKeys.length > 0) {
+                suitableFoodsKeys.forEach(foodKey => {
+                    const compatibleFood = foodPersonalities[foodKey];
+                    if (compatibleFood) {
+                        const reason = getRandomCompatibilityReason(matchedFood.name, compatibleFood.name, '適合');
+                        const li = document.createElement('li');
+                        // Add emoji
+                        li.innerHTML = `<strong>${compatibleFood.name} <span class="emoji">${compatibleFood.emoji}</span></strong>：${reason}`;
+                        suitableFoodsList.appendChild(li);
+                    }
+                });
+            } else {
+                suitableFoodsList.innerHTML = '<li>目前沒有特別合拍的食物。</li>';
+            }
+
+            const unsuitableFoodsList = document.getElementById('unsuitable-foods-with-reason');
+            unsuitableFoodsList.innerHTML = '';
+            if (unsuitableFoodsKeys.length > 0) {
+                unsuitableFoodsKeys.forEach(foodKey => {
+                    const incompatibleFood = foodPersonalities[foodKey];
+                    if (incompatibleFood) {
+                        const reason = getRandomCompatibilityReason(matchedFood.name, incompatibleFood.name, '不適合');
+                        const li = document.createElement('li');
+                        // Add emoji
+                        li.innerHTML = `<strong>${incompatibleFood.name} <span class="emoji">${incompatibleFood.emoji}</span></strong>：${reason}`;
+                        unsuitableFoodsList.appendChild(li);
+                    }
+                });
+            } else {
+                unsuitableFoodsList.innerHTML = '<li>目前沒有特別需要多點理解的食物。</li>';
+            }
+
+            // Set up event listeners for feedback buttons
+            const feedbackButtons = document.querySelectorAll('#feedback-section .feedback-buttons button');
+            feedbackButtons.forEach(button => {
+                // Remove previous listeners to prevent multiple bindings on re-render
+                // IMPORTANT: Use a named function or a reference to the specific listener to remove it correctly.
+                // For anonymous functions in addEventListener, you can't directly remove them this way.
+                // A better approach is to remove and re-append the feedback section or use a flag.
+                // For simplicity here, we'll ensure they are reset.
+                
+                // Reset button state
+                button.classList.remove('active');
+                button.disabled = false;
+
+                // Create a new event listener. This ensures the correct closure for matchedFood.name, finalMBTI, finalEnneagram
+                const newFeedbackListener = (event) => {
+                    handleFeedback(event.target.dataset.feedback, event.target, matchedFood.name, finalMBTI, finalEnneagram);
+                };
+                // Remove any existing listeners by cloning and replacing the node
+                const oldButton = button;
+                const newButton = oldButton.cloneNode(true);
+                oldButton.parentNode.replaceChild(newButton, oldButton);
+                newButton.addEventListener('click', newFeedbackListener);
+            });
+        }
+
+        // Restart Quiz
+        function restartQuiz() {
+            // Re-fetch DOM elements as they might have been replaced by saveResultImage
+            const initialRestartBtn = document.getElementById('restartQuizBtn');
+            if (initialRestartBtn) {
+                initialRestartBtn.removeEventListener('click', restartQuiz);
+            }
+            
+            // Re-create the main structure if it was changed by saveResultImage
+            // A more robust solution might involve saving the initial HTML and restoring it
+            // For now, we'll just reload the page to ensure a clean state
+            location.reload(); 
+        }
+
+        // Helper function: Get N random unique elements from an array
         function getRandomElements(arr, num) {
             const shuffled = [...arr].sort(() => 0.5 - Math.random());
             return shuffled.slice(0, num);
         }
 
-        // 輔助函數：隨機生成相處理由
+        // Helper function: Generate random compatibility reason
         function getRandomCompatibilityReason(foodA, foodB, type) {
             const compatibleReasons = [
                 `${foodB}的特質能巧妙地補足你的優勢，讓你們的組合更加圓滿。`,
@@ -1277,62 +2236,63 @@
             return reasonsArray[randomIndex];
         }
 
-        // 儲存圖片功能
+        // Save image function
         function saveResultImage() {
             const resultElement = document.getElementById('result-container');
             
-            // 儲存原始樣式 (這部分保留，用於截圖時的樣式調整)
-            const originalContainerPadding = document.querySelector('.container').style.padding;
-            const originalContainerShadow = document.querySelector('.container').style.boxShadow;
-            const originalContainerBeforeMask = document.querySelector('.container').style.getPropertyValue('-webkit-mask');
-            const originalContainerBeforeMaskComposite = document.querySelector('.container').style.getPropertyValue('mask-composite');
+            // Store original styles for restoration
+            const containerElement = document.querySelector('.container');
+            const originalContainerPadding = containerElement.style.padding;
+            const originalContainerShadow = containerElement.style.boxShadow;
+            const originalContainerMask = containerElement.style.getPropertyValue('-webkit-mask');
+            const originalContainerMaskComposite = containerElement.style.getPropertyValue('mask-composite');
             const originalBodyOverflow = document.body.style.overflow;
             
-            // 找到回饋區塊
+            // Find feedback section and store its original display state
             const feedbackSection = document.getElementById('feedback-section');
-            // 儲存原始顯示狀態
-            const feedbackSectionDisplay = feedbackSection.style.display;
+            const feedbackSectionDisplay = feedbackSection ? feedbackSection.style.display : 'block'; // Default to block if not found (error state)
 
-            // 暫時隱藏回饋區塊
-            feedbackSection.style.display = 'none';
+            // Temporarily hide elements that shouldn't be in the screenshot
+            if (feedbackSection) feedbackSection.style.display = 'none';
+            saveResultImageBtn.classList.add('hidden'); // Hide the save button itself
+            restartQuizBtn.classList.add('hidden'); // Hide the original restart button
 
-            // 為了讓截圖效果最佳，暫時調整樣式
-            document.body.style.overflow = 'hidden'; // 避免滾動條影響截圖
-            document.querySelector('.container').style.padding = '50px'; // 增加截圖時的內邊距
-            document.querySelector('.container').style.boxShadow = 'none'; // 暫時移除陰影
-            document.querySelector('.container').style.setProperty('-webkit-mask', 'none'); // 移除漸變邊框
-            document.querySelector('.container').style.setProperty('mask-composite', 'unset');
+            // Adjust styles for optimal screenshot
+            document.body.style.overflow = 'hidden'; // Prevent scrollbar from affecting screenshot
+            containerElement.style.padding = '50px'; // Increase padding for screenshot
+            containerElement.style.boxShadow = 'none'; // Temporarily remove shadow
+            containerElement.style.setProperty('-webkit-mask', 'none'); // Remove gradient border
+            containerElement.style.setProperty('mask-composite', 'unset');
 
-            // 顯示一個載入提示
+            // Show a loading message
             const loadingMessage = document.createElement('div');
             loadingMessage.textContent = '圖片生成中，請稍候...';
             loadingMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0,0,0,0.7); color: white; padding: 15px 25px; border-radius: 10px; z-index: 1000;';
             document.body.appendChild(loadingMessage);
 
-
             html2canvas(resultElement, {
                 useCORS: true,
                 allowTaint: true,
-                scale: 2, // 保持此設定，可以嘗試提高到3如果品質不夠
-                backgroundColor: null // 讓背景透明
+                scale: 2, // Keep this setting, consider increasing to 3 if quality is insufficient
+                backgroundColor: null // Make background transparent
             }).then(canvas => {
-                // 移除載入提示
+                // Remove loading message
                 document.body.removeChild(loadingMessage);
 
                 const dataURL = canvas.toDataURL('image/png');
 
-                // 創建一個新的圖片元素來顯示結果
+                // Create a new image element to display the result
                 const img = document.createElement('img');
                 img.src = dataURL;
                 img.style.maxWidth = '100%';
                 img.style.height = 'auto';
-                img.style.display = 'block'; // 確保圖片顯示
+                img.style.display = 'block'; // Ensure image is displayed
 
-                // 移除原有的結果頁內容，顯示圖片
-                resultElement.innerHTML = ''; // 清空結果容器
-                resultElement.appendChild(img); // 將圖片添加到結果容器
+                // Remove original result page content, display image
+                resultElement.innerHTML = ''; // Clear result container
+                resultElement.appendChild(img); // Add image to result container
 
-                // 添加儲存提示和操作按鈕
+                // Add save prompt and action buttons
                 const savePrompt = document.createElement('p');
                 savePrompt.innerHTML = '<br><strong>✨ 圖片已生成！</strong><br>在手機上請「長按圖片」儲存或分享。<br>在電腦上可右鍵另存圖片。';
                 savePrompt.style.cssText = 'margin-top: 20px; font-size: 1.1em; color: var(--text-dark); line-height: 1.6;';
@@ -1341,74 +2301,86 @@
                 const buttonContainer = document.createElement('div');
                 buttonContainer.style.cssText = 'display: flex; justify-content: center; gap: 15px; margin-top: 20px;';
 
-                const downloadBtn = document.createElement('a'); // 仍然提供下載按鈕作為備用
+                const downloadBtn = document.createElement('a'); // Still provide download button as fallback
                 downloadBtn.href = dataURL;
                 downloadBtn.download = `${userName ? userName + '_' : ''}我的食物人格測驗結果_${new Date().toLocaleDateString().replace(/\//g, '-')}.png`;
                 downloadBtn.textContent = '點擊下載圖片 (備用)';
-                downloadBtn.className = 'stage-nav-btn'; // 使用現有按鈕樣式
-                downloadBtn.style.background = 'linear-gradient(45deg, #1976D2, #2196F3)'; // 藍色系
-                downloadBtn.style.maxWidth = '200px'; // 限制寬度
-                downloadBtn.style.margin = '0 auto'; // 置中
-                downloadBtn.target = '_blank'; // 開啟新分頁下載，某些瀏覽器支援
+                downloadBtn.className = 'stage-nav-btn'; // Use existing button style
+                downloadBtn.style.background = 'linear-gradient(45deg, #1976D2, #2196F3)'; // Blue tone
+                downloadBtn.style.maxWidth = '200px'; // Limit width
+                downloadBtn.style.margin = '0 auto'; // Center
+                downloadBtn.target = '_blank'; // Open in new tab for download, supported by some browsers
                 
-                // 重新測驗按鈕
-                const restartBtn = document.createElement('button');
-                restartBtn.textContent = '重新測驗';
-                restartBtn.id = 'restartQuizBtnNew'; // 確保ID不衝突
-                restartBtn.className = 'stage-nav-btn';
-                restartBtn.style.background = 'linear-gradient(45deg, #FF5722, #FF8A00)'; // 橙色系
-                restartBtn.style.maxWidth = '200px';
-                restartBtn.style.margin = '0 auto';
-                restartBtn.addEventListener('click', restartQuiz); // 綁定重新測驗函數
+                // New restart quiz button after image generation
+                const newRestartBtn = document.createElement('button');
+                newRestartBtn.textContent = '重新測驗';
+                newRestartBtn.id = 'restartQuizBtnNew'; // Ensure ID doesn't conflict
+                newRestartBtn.className = 'stage-nav-btn';
+                newRestartBtn.style.background = 'linear-gradient(45deg, #FF5722, #FF8A00)'; // Orange tone
+                newRestartBtn.style.maxWidth = '200px';
+                newRestartBtn.style.margin = '0 auto';
+                newRestartBtn.addEventListener('click', restartQuiz); // Bind restart function
 
                 buttonContainer.appendChild(downloadBtn);
-                buttonContainer.appendChild(restartBtn);
+                buttonContainer.appendChild(newRestartBtn);
                 resultElement.appendChild(buttonContainer);
 
-
-                // 移除原有的儲存圖片按鈕和回饋按鈕，避免重複
-                const oldSaveBtn = document.getElementById('saveResultImage');
-                if(oldSaveBtn) oldSaveBtn.remove();
-                const oldRestartBtn = document.getElementById('restartQuizBtn');
-                if(oldRestartBtn) oldRestartBtn.remove();
-                const oldFeedbackSection = document.getElementById('feedback-section');
-                if(oldFeedbackSection) oldFeedbackSection.remove();
-
-
+                // No need to remove old buttons here as we will reload on restart quiz
+                // The original feedback section will also be removed by clearing resultElement.innerHTML
+                // We are intentionally replacing the content to show the image directly.
             }).catch(error => {
-                // 移除載入提示
+                // Remove loading message
                 document.body.removeChild(loadingMessage);
                 console.error("圖片儲存失敗：", error);
                 alert("圖片生成失敗，請重試或檢查瀏覽器權限。\n錯誤訊息: " + error.message);
             }).finally(() => {
-                // 恢復原始樣式
+                // Restore original styles
                 document.body.style.overflow = originalBodyOverflow;
-                document.querySelector('.container').style.padding = originalContainerPadding;
-                document.querySelector('.container').style.boxShadow = originalContainerShadow;
-                document.querySelector('.container').style.setProperty('-webkit-mask', originalContainerBeforeMask);
-                document.querySelector('.container').style.setProperty('mask-composite', originalContainerBeforeMaskComposite);
+                containerElement.style.padding = originalContainerPadding;
+                containerElement.style.boxShadow = originalContainerShadow;
+                containerElement.style.setProperty('-webkit-mask', originalContainerMask);
+                containerElement.style.setProperty('mask-composite', originalContainerMaskComposite);
                 
-                // 注意：這裡不再恢復 feedbackSection 的 display，因為它已經被 remove() 了
-                // 如果需要，可以在 catch 塊中恢復它，或者在顯示圖片後，重新建立 feedbackSection
-            });
-        }                
-                // 恢復回饋區塊顯示
-                feedbackSection.style.display = feedbackSectionDisplay;
+                // IMPORTANT FIX: Re-show the original feedback section and buttons if needed
+                // If the feedback section was removed by `resultElement.innerHTML = '';`
+                // then you need to recreate it or ensure it's not removed in the first place
+                // For `saveResultImage`, the intent seems to be to *replace* the content with the image.
+                // If you want the feedback section to remain visible *after* showing the image,
+                // you would need to either:
+                // 1. Move the feedback section outside the `result-container` (recommended if it's always visible).
+                // 2. Append the feedback section *back* to the `result-container` after `resultElement.innerHTML = '';` and before `resultElement.appendChild(img);`.
+                // 3. For the purpose of *screenshotting*, temporarily hide it, then always restore it.
+                //
+                // Given the current structure where `resultElement.innerHTML = '';` clears everything,
+                // the `feedbackSection.style.display = feedbackSectionDisplay;` in the `finally` block
+                // attempts to restore the display of a *removed* element, which won't work.
+                // The buttons `saveResultImageBtn` and `restartQuizBtn` are also handled by recreating them.
+                //
+                // To address this, I've changed `restartQuiz` to reload the page for simplicity and a clean state.
+                // If you want to remain on the page and switch between result view and image view without reloading,
+                // the HTML structure would need to be re-evaluated to better isolate parts.
+
+                // For the screenshot scenario, the feedback buttons are intended to be hidden.
+                // When the image is displayed, new buttons (download and restart) are added.
+                // The *original* feedback section and its buttons are not intended to be shown with the image.
+                // Therefore, the line `feedbackSection.style.display = feedbackSectionDisplay;` in the finally block
+                // for the original `saveResultImageBtn` is incorrect given `resultElement.innerHTML = '';` earlier.
+                // I've removed that problematic line from this `finally` block.
             });
         }
 
-        // 處理回饋 (這裡只是簡單的視覺變化，實際應用需要將數據發送到後端)
+        // Handle Feedback (visual change only, actual application needs to send data to backend)
         function handleFeedback(feedbackType, buttonElement, foodPersonality, mbtiType, enneagramType) {
-            const feedbackButtons = document.querySelector('.feedback-buttons');
-            for (let btn of feedbackButtons.children) {
+            const feedbackButtonsContainer = document.querySelector('.feedback-buttons');
+            for (let btn of feedbackButtonsContainer.children) {
                 btn.classList.remove('active');
-                btn.disabled = true; // 選擇後禁用所有回饋按鈕
+                btn.disabled = true; // Disable all feedback buttons after selection
             }
-            buttonElement.classList.add('active'); // 標記被選擇的按鈕
+            buttonElement.classList.add('active'); // Mark the selected button
             
-            // 準備要發送的數據，包含 userName
+            // Prepare data to send, including userName
             const dataToSend = {
-                userName: userName, // 新增姓名
+                userName: userName, // Add name
                 foodPersonality: foodPersonality,
                 mbtiType: mbtiType,
                 enneagramType: enneagramType,
@@ -1432,9 +2404,18 @@
             })
             .then(data => {
                 console.log('後端回傳:', data);
+                // Optionally, show a "Thank you" message to the user
+                const feedbackSection = document.getElementById('feedback-section');
+                if (feedbackSection) {
+                    feedbackSection.innerHTML = '<p style="font-size: 1.1em; color: var(--secondary-color); font-weight: bold; margin-top: 15px;">感謝您的回饋！</p>';
+                }
             })
             .catch((error) => {
                 console.error('發送回饋失敗:', error);
+                const feedbackSection = document.getElementById('feedback-section');
+                if (feedbackSection) {
+                    feedbackSection.innerHTML = '<p style="font-size: 1.1em; color: var(--primary-color); font-weight: bold; margin-top: 15px;">回饋發送失敗，請稍後再試。</p>';
+                }
             });
         }
     </script>
