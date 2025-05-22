@@ -1,1207 +1,4 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>食物人格測驗</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        /* CSS Custom Properties for easier color management */
-        :root {
-            --primary-color: #4CAF50; /* 深綠色 */
-            --primary-light: #66BB6A; /* 淺綠色 */
-            --secondary-color: #2196F3; /* 藍色 */
-            --secondary-light: #BBDEFB; /* 淺藍色 */
-            --background-gradient-start: #eef7ff; /* 柔和淺藍 */
-            --background-gradient-end: #dceafc;   /* 稍深淺藍 */
-            --card-background: #ffffff;
-            --card-shadow: rgba(0, 0, 0, 0.15);
-            --text-dark: #333;
-            --text-medium: #555;
-            --text-light: #666;
-            --button-hover: #45a049;
-            --option-bg-light: #e0f8e0; /* 更柔和的綠色 */
-            --option-border: #a7d9a9;
-            --option-selected-bg: #c8e6c9;
-            --result-bg: #fdfdfd;
-            --result-shadow-inset: rgba(0, 0, 0, 0.03);
-            --highlight-color: #ff8a00; /* 暖橙色 */
-            --compatible-bg: #e3f2fd;
-            --compatible-border: #bbdefb;
-            --incompatible-bg: #ffe0b2; /* 柔和橙色 */
-            --incompatible-border: #ffcc80;
-        }
-
-        body {
-            font-family: 'Noto Sans TC', 'Roboto', 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* 保持 flex-start，方便捲動 */
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
-            margin: 0;
-            padding: 30px; /* 增加整體邊距 */
-            box-sizing: border-box;
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        .container {
-            background-color: var(--card-background);
-            border-radius: 25px; /* 更大的圓角 */
-            box-shadow: 0 15px 40px var(--card-shadow); /* 更深的陰影 */
-            padding: 40px; /* 增加內邊距 */
-            text-align: center;
-            max-width: 750px; /* 略微增加最大寬度 */
-            width: 100%;
-            transition: all 0.5s ease-in-out;
-            border: 2px solid rgba(255, 255, 255, 0.8); /* 輕微的白色邊框 */
-            overflow: hidden; /* 確保內容不超出圓角 */
-            position: relative; /* 為了可能的裝飾元素 */
-        }
-
-        /* 輕微的漸變邊框效果 */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 25px;
-            padding: 2px;
-            background: linear-gradient(45deg, var(--primary-light), var(--secondary-light));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none; /* 讓點擊穿透到下面的內容 */
-        }
-
-        .hidden {
-            display: none !important; /* 使用 !important 確保強制隱藏 */
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 2.8em; /* 更大的標題 */
-            letter-spacing: 1.5px;
-            font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            color: var(--text-medium);
-            font-size: 1.8em;
-            margin-bottom: 10px;
-            font-weight: 400;
-        }
-
-        h3 {
-            color: var(--secondary-color);
-            font-size: 1.6em; /* 調整結果頁標題大小 */
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--secondary-light);
-            padding-bottom: 8px;
-            font-weight: 700;
-        }
-
-        /* 調整首頁的介紹文字樣式 */
-        #intro-container .intro-text { /* 新增的 class */
-            font-size: 1.2em; /* 問題文字更大 */
-            margin: 0 auto 30px auto; /* 上下邊距，左右自動實現置中 */
-            color: var(--text-medium);
-            line-height: 1.7;
-            font-weight: 300;
-            text-align: center; /* 首頁文字置中 */
-            max-width: 80%; /* 限制寬度 */
-        }
-        /* 測驗問題的文字樣式保持不變 */
-        .question-text {
-            font-size: 1.2em; /* 問題文字更大 */
-            margin-bottom: 25px;
-            color: var(--text-medium);
-            line-height: 1.7;
-            font-weight: 300;
-            text-align: left; /* 問題文字靠左 */
-            border-left: 4px solid var(--primary-light);
-            padding-left: 15px;
-            margin-top: 30px; /* 與上方引文間距 */
-        }
-
-        .stage-intro {
-            font-size: 1.3em;
-            color: var(--secondary-color);
-            margin-bottom: 30px;
-            line-height: 1.8;
-            font-weight: 400;
-            text-align: center;
-            background-color: var(--background-gradient-start);
-            padding: 20px 25px;
-            border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-            border: 1px dashed var(--secondary-light);
-        }
-
-        .question-block {
-            margin-bottom: 40px; /* 每個問題區塊的間距 */
-            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-            padding-bottom: 30px;
-        }
-
-        .question-block:last-child {
-            border-bottom: none; /* 最後一個問題區塊沒有底線 */
-            padding-bottom: 0;
-            margin-bottom: 0;
-        }
-
-
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* 增加選項間距 */
-        }
-
-        .option-btn {
-            background-color: var(--option-bg-light);
-            color: var(--primary-color);
-            border: 1px solid var(--option-border); /* 細邊框 */
-            padding: 14px 25px; /* 增加內邊距 */
-            border-radius: 12px; /* 更大的圓角 */
-            font-size: 1.1em; /* 字體更大 */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* 更明顯的陰影 */
-            text-align: left;
-            font-weight: 400;
-        }
-
-        .option-btn:hover {
-            background-color: var(--option-selected-bg);
-            transform: translateY(-3px); /* 更明顯的抬升 */
-            border-color: var(--primary-color);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-        }
-
-        .option-btn.selected {
-            background-color: var(--primary-light);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            font-weight: 700; /* 選中後加粗 */
-        }
-
-        .option-btn:active {
-            transform: translateY(0);
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            gap: 20px; /* 按鈕間距 */
-        }
-
-        .stage-nav-btn {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light)); /* 漸變背景 */
-            color: white;
-            border: none;
-            padding: 14px 30px; /* 增加內邊距 */
-            border-radius: 10px; /* 更大的圓角 */
-            font-size: 1.15em; /* 字體更大 */
-            cursor: pointer;
-            flex-grow: 1; /* 讓按鈕平均分配空間 */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* 更明顯的陰影 */
-            font-weight: 700;
-        }
-
-        .stage-nav-btn:hover {
-            background: linear-gradient(45deg, var(--primary-light), var(--primary-color)); /* 漸變反轉 */
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .stage-nav-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* 上一階段按鈕的樣式微調 */
-        .stage-nav-btn.prev-btn {
-            background: linear-gradient(45deg, #78909C, #90A4AE); /* 不同的漸變色 */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        .stage-nav-btn.prev-btn:hover {
-            background: linear-gradient(45deg, #90A4AE, #78909C);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        /* 姓名輸入欄位 */
-        .name-input-group {
-            margin-bottom: 25px;
-            text-align: left;
-            padding: 0 20px; /* 讓輸入框和標籤有內邊距 */
-        }
-        .name-input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-            color: var(--text-medium);
-            font-weight: 500;
-        }
-        .name-input-group input[type="text"] {
-            width: calc(100% - 20px); /* 考慮 padding */
-            padding: 12px 10px;
-            border: 1px solid var(--option-border);
-            border-radius: 8px;
-            font-size: 1.1em;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        .name-input-group input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); /* 綠色光暈效果 */
-        }
-
-        /* 結果頁樣式 */
-        #result-container {
-            padding: 30px;
-            background-color: var(--result-bg);
-            border-radius: 20px;
-            box-shadow: inset 0 0 15px var(--result-shadow-inset); /* 柔和內陰影 */
-            margin-top: 20px;
-            text-align: left; /* 讓文字靠左對齊 */
-        }
-
-        #final-food-personality {
-            font-size: 4em; /* 最終食物人格字體超大 */
-            margin-bottom: 20px;
-            color: var(--highlight-color); /* 突出顏色 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(255, 138, 0, 0.2); /* 輕微文字陰影 */
-        }
-
-        #final-food-personality .emoji {
-            font-size: 1.8em; /* 表情符號更大 */
-            vertical-align: middle;
-        }
-
-        #food-personality-description {
-            font-size: 1.3em; /* 描述文字更大 */
-            color: var(--text-light);
-            line-height: 1.9; /* 增加行高 */
-            margin-bottom: 35px;
-            text-align: justify; /* 左右對齊 */
-            text-indent: 2.5em; /* 首行縮排 */
-            background-color: rgba(240, 248, 255, 0.6); /* 輕微背景色 */
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(var(--secondary-light), 0.5);
-        }
-
-        #compatibility-container {
-            margin-top: 40px;
-            border-top: 1px dashed #ddd;
-            padding-top: 25px;
-            text-align: left;
-        }
-
-        #compatibility-container ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 25px; /* 增加列表間距 */
-        }
-
-        #compatibility-container ul li {
-            background-color: var(--compatible-bg); /* 合拍食物的背景 */
-            border: 1px solid var(--compatible-border);
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            font-size: 1.15em;
-            line-height: 1.6;
-            color: var(--text-dark);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        #compatibility-container ul li:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        #compatibility-container ul li strong {
-            color: var(--secondary-color); /* 合拍食物名稱顏色 */
-            font-weight: bold;
-        }
-        #compatibility-container ul li strong .emoji { /* 合拍食物的 emoji 樣式 */
-            font-size: 1em;
-            vertical-align: middle;
-            margin-left: 5px; /* 稍微與文字分離 */
-        }
-
-
-        #unsuitable-foods-with-reason li {
-            background-color: var(--incompatible-bg); /* 不合拍食物的背景 */
-            border-color: var(--incompatible-border);
-        }
-
-        #unsuitable-foods-with-reason li strong {
-            color: var(--highlight-color); /* 不合拍食物名稱顏色 */
-        }
-        #unsuitable-foods-with-reason li strong .emoji { /* 不合拍食物的 emoji 樣式 */
-            font-size: 1em;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
-
-        /* 回饋問卷樣式 */
-        .feedback-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap; /* 小螢幕換行 */
-        }
-        .feedback-buttons button {
-            background-color: #f0f0f0;
-            color: var(--text-medium);
-            border: 1px solid #ccc;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1; /* 讓按鈕平均分配空間 */
-            min-width: 120px; /* 最小寬度 */
-            max-width: 180px; /* 最大寬度 */
-        }
-        .feedback-buttons button:hover:not(:disabled) {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .feedback-buttons button.active {
-            background-color: var(--secondary-color);
-            color: white;
-            border-color: var(--secondary-color);
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
-            transform: translateY(-1px);
-        }
-        .feedback-buttons button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .disclaimer {
-            margin-top: 30px; /* 與上方按鈕的距離 */
-            font-size: 0.9em;
-            color: #888;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.5);
-            padding: 10px 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            backdrop-filter: blur(5px); /* 毛玻璃效果 */
-            -webkit-backdrop-filter: blur(5px);
-            width: 100%; /* 確保橫向佔滿 */
-            max-width: 650px; /* 與容器相同寬度 */
-            box-sizing: border-box; /* 包含 padding 在寬度內 */
-        }
-
-        /* 首頁容器的 Flexbox 佈局，讓內容置中 */
-        #intro-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* 水平置中 */
-            justify-content: center; /* 垂直置中 (如果空間允許) */
-            height: 100%; /* 確保佔據父容器的高度 */
-        }
-
-        /* 響應式設計調整 */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-            .container {
-                padding: 30px;
-                border-radius: 20px;
-            }
-            .container::before {
-                border-radius: 20px;
-            }
-            h1 {
-                font-size: 2.2em;
-                margin-bottom: 20px;
-            }
-            #intro-container .intro-text {
-                font-size: 1.1em;
-                margin-bottom: 20px;
-            }
-            .question-text {
-                font-size: 1.1em;
-                margin-bottom: 20px;
-                padding-left: 10px;
-            }
-            .stage-intro {
-                font-size: 1.1em;
-                padding: 15px 20px;
-            }
-            .option-btn {
-                font-size: 1.05em;
-                padding: 12px 20px;
-            }
-            .navigation-buttons {
-                flex-direction: column; /* 小螢幕下按鈕垂直排列 */
-                gap: 15px;
-            }
-            .stage-nav-btn {
-                padding: 12px 25px;
-                font-size: 1.1em;
-                margin-top: 0px; /* 這裡的 margin-top 不再需要 */
-            }
-            #final-food-personality {
-                font-size: 3em;
-                gap: 10px;
-            }
-            #final-food-personality .emoji {
-                font-size: 1.5em;
-            }
-            #food-personality-description {
-                font-size: 1.1em;
-                padding: 15px;
-            }
-            #compatibility-container h3 {
-                font-size: 1.5em;
-            }
-            #compatibility-container ul li {
-                font-size: 1.05em;
-                padding: 12px;
-            }
-            .feedback-buttons button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-                min-width: unset; /* 移除最小寬度限制 */
-                max-width: unset;
-                flex-basis: auto; /* 自動調整寬度 */
-            }
-            .disclaimer {
-                max-width: 550px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            #intro-container .intro-text {
-                font-size: 0.95em;
-                margin-bottom: 15px;
-            }
-            .question-text {
-                font-size: 0.95em;
-                margin-bottom: 15px;
-            }
-            .stage-intro {
-                font-size: 1em;
-                padding: 10px 15px;
-            }
-            .option-btn {
-                font-size: 0.9em;
-                padding: 10px 15px;
-            }
-            .navigation-buttons {
-                gap: 10px;
-            }
-            .stage-nav-btn {
-                padding: 10px 20px;
-                font-size: 1em;
-            }
-            #final-food-personality {
-                font-size: 2.5em;
-                flex-direction: column; /* 小螢幕下讓 emoji 和文字垂直排列 */
-            }
-            #final-food-personality .emoji {
-                font-size: 1.3em;
-            }
-            #food-personality-description {
-                font-size: 0.95em;
-                text-indent: 1.5em;
-            }
-            #compatibility-container h3 {
-                font-size: 1.3em;
-            }
-            #compatibility-container ul li {
-                font-size: 0.9em;
-                padding: 10px;
-            }
-            .feedback-buttons button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-                min-width: unset; /* 移除最小寬度限制 */
-                max-width: unset;
-                flex-basis: auto; /* 自動調整寬度 */
-            }
-            .disclaimer {
-                margin-top: 20px;
-                padding: 8px 15px;
-                max-width: 350px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div id="intro-container">
-            <h1>測測你是什麼食物人格！</h1>
-            <p class="intro-text">在繁忙的日常生活中，你是否有過一些隱藏的特質，就像不同的食物一樣，擁有獨特的風味和個性？快來測測看，你是哪種美味的食物人格！</p>
-            <div class="name-input-group">
-                <label for="userName">你的姓名 (選填)</label>
-                <input type="text" id="userName" placeholder="請輸入你的姓名">
-            </div>
-            <button id="startQuizBtn" class="stage-nav-btn">開始測驗</button>
-            <div class="disclaimer" id="introDisclaimer">
-                <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
-            </div>
-        </div>
-
-        <div id="quiz-container" class="hidden">
-            <div id="current-stage-content"></div>
-            <div class="navigation-buttons">
-                <button id="prevStageBtn" class="stage-nav-btn prev-btn hidden">上一階段</button>
-                <button id="nextStageBtn" class="stage-nav-btn">下一階段</button>
-            </div>
-        </div>
-
-        <div id="result-container" class="hidden">
-            <h2>你就像...</h2>
-            <h3 id="final-food-personality"></h3>
-            <p id="food-personality-description"></p>
-            <div id="compatibility-container">
-                <h3>合拍的食物</h3>
-                <ul id="suitable-foods-with-reason"></ul>
-                <h3>需要多點理解的食物</h3>
-                <ul id="unsuitable-foods-with-reason"></ul>
-            </div>
-            <div class="disclaimer" id="resultDisclaimer">
-                <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
-            </div>
-
-            <div id="feedback-section">
-                <p style="margin-top:25px;"><strong>你覺得這個測驗結果符合你嗎？</strong></p>
-                <div class="feedback-buttons">
-                    <button data-feedback="yes">非常符合！</button>
-                    <button data-feedback="somewhat">有點符合</button>
-                    <button data-feedback="no">不太符合</button>
-                </div>
-                <button id="saveResultImage" class="stage-nav-btn">儲存結果為圖片</button>
-                <button id="restartQuizBtn" class="stage-nav-btn">重新測驗</button>
-            </div>
-        </div>
-
-
-    <script>
-        // 測驗題目資料 (分階段)
-        const stages = [
-            {
-                intro: "✨ **階段一：初登場與自我適應** ✨<br>歡迎來到食物生存大賽！你剛發現自己變成了一塊食物。這第一個階段將探索你在全新環境下的初始反應和如何適應這個奇妙的新身份。",
-                questions: [
-                    {
-                        question: "1. 一覺醒來，你發現自己變成了一塊食物，你的第一反應？",
-                        options: [
-                            { text: "先觀察周圍環境，不慌不忙", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 5: 2, 6: 1 } } },
-                            { text: "「也太好玩了吧！」立刻想拍 vlog", scores: { mbti: { E: 2, N: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } },
-                            { text: "馬上擬定逃脫計畫", scores: { mbti: { I: 1, N: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
-                            { text: "淡淡地接受命運，感嘆人生多變", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "2. 在這個全新的食物世界，你需要向一群陌生食物自我介紹，你會？",
-                        options: [
-                            { text: "熱情開場，還幫別人介紹", scores: { mbti: { E: 2, F: 1 }, enneagram: { 2: 2, 7: 1 } } },
-                            { text: "簡短講完就想快閃", scores: { mbti: { I: 2, T: 1 }, enneagram: { 5: 2, 6: 1 } } },
-                            { text: "講得很哲學，希望有人懂你", scores: { mbti: { I: 1, N: 1, F: 2 }, enneagram: { 4: 2, 9: 1 } } },
-                            { text: "偷偷觀察其他人如何做再行動", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "3.你最希望自己成為怎樣的食物，會讓大家記住你？",
-                        options: [
-                            { text: "有愛心且被大家需要", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 2: 2, 9: 1 } } },
-                            { text: "勇敢且成就非凡", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
-                            { text: "獨特且充滿創意", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
-                            { text: "安穩可靠，值得信賴", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 6: 2, 1: 1 } } }
-                        ]
-                    },
-                ]
-            },
-            {
-                intro: "🤝 **階段二：團隊組建與初次挑戰** 🤝<br>在食物世界裡，合作是生存之道。你將與其他食物組成隊伍，共同面對料理任務。這個階段考驗你的領導、協作與應變能力。",
-                questions: [
-                    {
-                        question: "4. 面對即將到來的團隊挑戰，你會選擇在隊伍中扮演什麼角色？",
-                        options: [
-                            { text: "隊伍裡的助手，協助大家", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
-                            { text: "領導者，掌握全局", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
-                            { text: "觀察者，冷靜分析", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 1: 1 } } },
-                            { text: "自由行動者，靈活應變", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 7: 2, 8: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "5. 隊伍中，你被選為隊長，要帶領大家完成一個困難的料理任務，你會？",
-                        options: [
-                            { text: "公開表決，大家說了算", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 9: 2, 2: 1 } } },
-                            { text: "親自規劃戰術與分工", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
-                            { text: "默默完成最多事情但不爭功", scores: { mbti: { I: 1, S: 2, T: 1, P: 1 }, enneagram: { 6: 2, 5: 1 } } },
-                            { text: "用故事鼓舞大家的心", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 7: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "6. 評審說你很像「甜點系」食物，這會影響你的隊伍分工，你怎麼回應？",
-                        options: [
-                            { text: "「謝謝誇獎，我也覺得我很香！」", scores: { mbti: { E: 2, S: 1, F: 1, P: 1 }, enneagram: { 3: 2, 7: 1 } } },
-                            { text: "「我其實是鹹的，別誤會我了」", scores: { mbti: { I: 1, S: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
-                            { text: "「你覺得像甜的，是因為你不懂我。」", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } },
-                            { text: "「那我就來發揮甜點的最大價值！」", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "7. 比賽中遇到一個關鍵選擇，你的隊伍需要決定下一步策略，你通常怎麼做？",
-                        options: [
-                            { text: "分析利弊再決定", scores: { mbti: { I: 1, N: 2, T: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
-                            { text: "聽從直覺與情緒", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
-                            { text: "問朋友大家意見如何", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } },
-                            { text: "先衝再說，之後再調整", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 7: 2, 8: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "8.「食物界大戰」的號角即將吹響，你們隊伍準備怎麼應對這場決賽？",
-                        options: [
-                            { text: "仔細計畫與準備", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
-                            { text: "隨遇而安，適應環境", scores: { mbti: { I: 1, S: 2, P: 1 }, enneagram: { 6: 2, 9: 1 } } },
-                            { text: "組織團隊，發揮合作", scores: { mbti: { E: 2, N: 1, F: 1, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
-                            { text: "衝鋒陷陣，勇往直前", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
-                        ]
-                    },
-                ]
-            },
-            {
-                intro: "🧠 **階段三：賽中突發狀況與人際處理** 🧠<br>比賽中總是充滿變數，人際關係也複雜多變。你將面對突發狀況和人際考驗，你的反應和處理方式將決定你的食物人格走向。",
-                questions: [
-                    {
-                        question: "9. 比賽期間，你發現有敵隊的食物作弊，但他們成績斐然，你會？",
-                        options: [
-                            { text: "錄影檢舉，公平最重要", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
-                            { text: "私下找他談談，勸他坦白", scores: { mbti: { I: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
-                            { text: "默默記下來，但不出聲", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 9: 1 } } },
-                            { text: "想說這只是遊戲，何必較真", scores: { mbti: { E: 1, S: 2, F: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "10. 評審突然要求你進行一場即興的「食材搭配表演」，你會？",
-                        options: [
-                            { text: "大膽表演，成為焦點", scores: { mbti: { E: 2, S: 1, P: 1 }, enneagram: { 3: 2, 7: 1 } } },
-                            { text: "謹慎準備，求完美", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
-                            { text: "發揮創意，玩出新花樣", scores: { mbti: { E: 1, N: 2, P: 1 }, enneagram: { 7: 2, 4: 1 } } },
-                            { text: "保持冷靜，穩穩完成", scores: { mbti: { I: 1, S: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "11.你的隊友「玻璃心起司鍋」因為表現不佳而情緒崩潰，你會？",
-                        options: [
-                            { text: "讓他哭一哭再抱抱", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 2: 2, 9: 1 } } },
-                            { text: "直接告訴他「你要堅強一點！」", scores: { mbti: { E: 1, S: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
-                            { text: "請別人幫我處理，我不想被情緒勒索", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 4: 1 } } },
-                            { text: "陪他畫畫聊聊天，轉移情緒", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 7: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "12. 有同隊的食物搶走了你精心準備的「創意點子」的功勞，你會？",
-                        options: [
-                            { text: "直接對質，維護自己的權益", scores: { mbti: { E: 1, S: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
-                            { text: "心裡不滿，但選擇忍耐", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 9: 2, 6: 1 } } },
-                            { text: "試著轉移注意力，避免衝突", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 2: 2, 7: 1 } } },
-                            { text: "暗自努力證明自己更強", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 1: 2, 3: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "13. 你的隊友在某個環節不幸被淘汰了，你會？",
-                        options: [
-                            { text: "立刻安慰並幫忙", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
-                            { text: "默默感到難過，自己也陷入低潮", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } },
-                            { text: "迅速調整策略，繼續前進", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
-                            { text: "覺得是自然淘汰，沒什麼大不了", scores: { mbti: { I: 1, S: 2, T: 1, P: 1 }, enneagram: { 5: 2, 1: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "14. 你發現你暗戀的「米其林主廚」是敵隊的關鍵人物…？",
-                        options: [
-                            { text: "想辦法和他私下聯絡", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 2: 1 } } },
-                            { text: "隱藏情感，專注比賽", scores: { mbti: { I: 2, S: 1, T: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
-                            { text: "苦惱又矛盾，心情複雜", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 6: 1 } } },
-                            { text: "覺得這是有趣的挑戰", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
-                        ]
-                    },
-                ]
-            },
-            {
-                intro: "🔥 **階段四：壓力與自省** 🔥<br>比賽進入白熱化階段，壓力和挑戰接踵而來。這個階段將深入你的內心，探索你如何在壓力下自我反思，以及你最珍視的價值。",
-                questions: [
-                    {
-                        question: "15. 比賽進入最終衝刺，你突然遇到一個預料之外的「食材變質」危機，你的反應是？",
-                        options: [
-                            { text: "立刻想辦法應對並幫助他人", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 6: 2, 2: 1 } } },
-                            { text: "躲起來思考哪裡最安全", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 9: 1 } } },
-                            { text: "「這可能是命運的考驗…」開始自省", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 1: 1 } } },
-                            { text: "「燃燒吧！我就是火焰！」（勇敢面對危機）", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "16. 比賽間隙的短暫休息時間，你會如何利用來「充電」？",
-                        options: [
-                            { text: "獨自沉思，充電休息", scores: { mbti: { I: 2, N: 1, T: 1, J: 1 }, enneagram: { 5: 2, 1: 1 } } },
-                            { text: "熱鬧社交，認識新朋友", scores: { mbti: { E: 2, S: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } },
-                            { text: "和熟悉的人聊聊天", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 9: 2, 6: 1 } } },
-                            { text: "做點喜歡的小事情放鬆", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 4: 2, 5: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "17. 在這場食物生存大賽中，你最害怕失去什麼？",
-                        options: [
-                            { text: "被忽視與遺忘", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 2: 1 } } },
-                            { text: "失控和混亂", scores: { mbti: { E: 1, S: 1, T: 2, P: 1 }, enneagram: { 8: 2, 1: 1 } } },
-                            { text: "無用與被拒絕", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 3: 1 } } },
-                            { text: "孤獨與被排斥", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "18. 在一場激烈的「食物理念辯論」中，評審問你：「你作為食物，你存在的意義是？」你說？",
-                        options: [
-                            { text: "「為了讓別人開心、被喜歡！」", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 2: 2, 7: 1 } } },
-                            { text: "「為了完成使命，挑戰極限。」", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
-                            { text: "「沒有意義，但我會自己創造。」", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 5: 1 } } },
-                            { text: "我是提供解決方案的那個人。」", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 5: 2, 1: 1 } } }
-                        ]
-                    },
-                ]
-            },
-            {
-                intro: "🏆 **階段五：決賽與最終定論** 🏆<br>恭喜你來到最後一個階段！所有的努力都將在這一刻得到定義。你的選擇將引導你揭示你的終極食物人格，並展望你的風味未來。",
-                questions: [
-                    {
-                        question: "19. 經過這場風味大戰的洗禮，如果可以選擇「風味重生」，你會選擇成為怎樣的食物？",
-                        options: [
-                            { text: "沒人認得我，我可以重新定義自己", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
-                            { text: "功能強大、受人倚賴的角色", scores: { mbti: { E: 1, S: 1, T: 2, J: 1 }, enneagram: { 3: 2, 8: 1 } } },
-                            { text: "可愛又有人保護我", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 6: 2, 2: 1 } } },
-                            { text: "跟現在一樣，我覺得我不錯", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 9: 2, 1: 1 } } }
-                        ]
-                    },
-                    {
-                        question: "20. 最終評審對你進行了定義，宣布你屬於某種「食物人格」。你的反應是？",
-                        options: [
-                            { text: "接受這個定義，努力做好自己", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 9: 2, 6: 1 } } },
-                            { text: "挑戰評審，證明自己不同", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
-                            { text: "重新定義自己，開創新路", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
-                            { text: "笑看結果，隨緣自在", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 9: 1 } } }
-                        ]
-                    }
-                ]
-            }
-        ];
-
-        // 食物人格定義 (與之前相同，但需要每個食物的 emoji)
-        const foodPersonalities = {
-            macaron: { name: '馬卡龍', emoji: '🍬', description: '你像馬卡龍一樣，充滿了繽紛的想像力與對世界的好奇心。你熱情、樂觀，並且善於表達情感，總能為周遭帶來歡樂與活力。' },
-            tofuPudding: { name: '豆花', emoji: '🍮', description: '你像豆花一樣溫潤而平易近人，擁有一顆柔軟且富有同理心的心。你樂於助人，善於傾聽，是朋友和家人心中最溫暖的港灣。' },
-            grilledCheeseSandwich: { name: '熱壓吐司', emoji: '🥪', description: '你像熱壓吐司一樣，外表酥脆，內心柔軟而充實。你務實、可靠，總能給人帶來安全感，並且在關鍵時刻展現出你的韌性。' },
-            blackCoffee: { name: '黑咖啡', emoji: '☕', description: '你像黑咖啡一樣，沉穩、理性，具有深度。你喜歡獨立思考，追求事物的本質，並且在面對挑戰時展現出堅定的意志。' },
-            popcorn: { name: '爆米花', emoji: '🍿', description: '你像爆米花一樣，充滿了活力與驚喜。你熱愛自由，喜歡嘗試新事物，並且總能用你的熱情感染周遭的人。' },
-            cottonCandy: { name: '棉花糖', emoji: '☁️', description: '你像棉花糖一樣，輕盈、柔軟，充滿了夢幻。你敏感、富有想像力，並且擁有一顆純真善良的心，總能為世界帶來一絲甜蜜。' },
-            zucchini: { name: '櫛瓜', emoji: '🥒', description: '你像櫛瓜一樣，清新、自然，內斂而有深度。你冷靜、理性，善於分析，並且總能保持客觀的態度看待事物。' },
-            cheeseFondue: { name: '起司鍋', emoji: '🫕', description: '你像起司鍋一樣，濃郁、熱情，充滿了感染力。你果斷、有行動力，並且總能帶領團隊邁向成功。' },
-            roastedSweetPotato: { name: '烤地瓜', emoji: '🍠', description: '你像烤地瓜一樣，溫暖、踏實，給人一種安心的感覺。你內斂、真誠，並且擁有堅韌的生命力，總能默默地支持身邊的人。' }
-        };
-        const allFoodKeys = Object.keys(foodPersonalities);
-
-        let currentStageIndex = 0;
-        // 儲存用戶答案的物件，鍵是問題的 index (0-based)，值是選擇的選項 index
-        let userAnswers = {};
-        let userName = ''; // 用於儲存用戶姓名
-
-        // MBTI 傾向分數 (初始為 0，表示中立)
-        let mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-        // 九型人格分數 (初始為 0，表示中立)
-        let enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-
-        // DOM 元素
-        const introContainer = document.getElementById('intro-container');
-        const quizContainer = document.getElementById('quiz-container');
-        const resultContainer = document.getElementById('result-container');
-        const startQuizBtn = document.getElementById('startQuizBtn');
-        const currentStageContent = document.getElementById('current-stage-content');
-        const prevStageBtn = document.getElementById('prevStageBtn');
-        const nextStageBtn = document.getElementById('nextStageBtn');
-        const restartQuizBtn = document.getElementById('restartQuizBtn');
-        const saveResultImageBtn = document.getElementById('saveResultImage');
-        const introDisclaimer = document.getElementById('introDisclaimer'); // 首頁免責聲明
-        const resultDisclaimer = document.getElementById('resultDisclaimer'); // 結果頁免責聲明
-        const userNameInput = document.getElementById('userName'); // 姓名輸入框
-
-        // 事件監聽器
-        startQuizBtn.addEventListener('click', startQuiz);
-        nextStageBtn.addEventListener('click', navigateStage);
-        prevStageBtn.addEventListener('click', navigateStage);
-        restartQuizBtn.addEventListener('click', restartQuiz);
-        saveResultImageBtn.addEventListener('click', saveResultImage);
-
-        // 啟動測驗
-        function startQuiz() {
-            userName = userNameInput.value.trim();
-            
-            introContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            introDisclaimer.classList.add('hidden'); // 隱藏首頁免責聲明
-
-            currentStageIndex = 0;
-            userAnswers = {}; // 重置所有答案
-            mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-            renderStage();
-            window.scrollTo(0, 0); // 捲動到頁面頂部
-        }
-
-        // 渲染當前階段的問題和選項
-        function renderStage() {
-            const currentStage = stages[currentStageIndex];
-            currentStageContent.innerHTML = ''; // 清空舊內容
-
-            // 添加階段引文
-            const introDiv = document.createElement('div');
-            introDiv.classList.add('stage-intro');
-            introDiv.innerHTML = currentStage.intro;
-            currentStageContent.appendChild(introDiv);
-
-            // 遍歷當前階段的所有問題
-            currentStage.questions.forEach((qData, qIndexInStage) => {
-                // 計算這個問題在 `questions` 總列表中的實際索引
-                const questionGlobalIndex = getQuestionGlobalIndex(currentStageIndex, qIndexInStage);
-
-                const questionBlock = document.createElement('div');
-                questionBlock.classList.add('question-block');
-
-                const qText = document.createElement('p');
-                qText.classList.add('question-text');
-                qText.innerHTML = qData.question;
-                questionBlock.appendChild(qText);
-
-                const optionsDiv = document.createElement('div');
-                optionsDiv.classList.add('options-container');
-
-                qData.options.forEach((option, optionIndex) => {
-                    const button = document.createElement('button');
-                    button.classList.add('option-btn');
-                    button.innerText = option.text;
-                    // 將問題的全球索引和選項的索引儲存起來
-                    button.dataset.questionGlobalIndex = questionGlobalIndex;
-                    button.dataset.optionIndex = optionIndex;
-                    button.dataset.mbti = JSON.stringify(option.scores.mbti);
-                    button.dataset.enneagram = JSON.stringify(option.scores.enneagram);
-
-                    // 如果這個問題之前已經有選擇，則標記為 selected
-                    if (userAnswers[questionGlobalIndex] === optionIndex) {
-                        button.classList.add('selected');
-                    }
-
-                    button.addEventListener('click', selectOption);
-                    optionsDiv.appendChild(button);
-                });
-                questionBlock.appendChild(optionsDiv);
-                currentStageContent.appendChild(questionBlock);
-            });
-
-            updateNavigationButtons();
-            window.scrollTo(0, 0); // 每次渲染新階段時捲動到頁面頂部
-        }
-
-        // 導航按鈕的顯示和功能
-        function updateNavigationButtons() {
-            // 上一階段按鈕
-            if (currentStageIndex === 0) {
-                prevStageBtn.classList.add('hidden');
-            } else {
-                prevStageBtn.classList.remove('hidden');
-                prevStageBtn.innerText = '上一階段';
-                prevStageBtn.dataset.direction = 'prev';
-            }
-
-            // 下一階段/查看結果按鈕
-            if (currentStageIndex === stages.length - 1) {
-                nextStageBtn.innerText = '查看結果';
-                nextStageBtn.dataset.direction = 'result';
-            } else {
-                nextStageBtn.innerText = '下一階段';
-                nextStageBtn.dataset.direction = 'next';
-            }
-            nextStageBtn.classList.remove('hidden'); // 確保下一階段按鈕總是顯示
-        }
-
-        // 選項點擊事件
-        function selectOption(event) {
-            const clickedButton = event.target;
-            const questionGlobalIndex = parseInt(clickedButton.dataset.questionGlobalIndex);
-            const optionIndex = parseInt(clickedButton.dataset.optionIndex);
-
-            // 獲取當前問題的所有選項按鈕
-            const optionsContainer = clickedButton.closest('.options-container');
-            const allOptionButtons = Array.from(optionsContainer.children);
-
-            // 如果點擊的是已經選中的選項，則取消選擇
-            if (clickedButton.classList.contains('selected')) {
-                clickedButton.classList.remove('selected');
-                delete userAnswers[questionGlobalIndex]; // 從答案中移除此題
-            } else {
-                // 否則，取消其他選項的選中狀態
-                allOptionButtons.forEach(btn => btn.classList.remove('selected'));
-                // 選中當前點擊的選項
-                clickedButton.classList.add('selected');
-                // 儲存用戶的答案
-                userAnswers[questionGlobalIndex] = optionIndex;
-            }
-        }
-
-        // 導航邏輯 (下一階段/上一階段/查看結果)
-        function navigateStage(event) {
-            const direction = event.target.dataset.direction;
-
-            if (direction === 'prev') {
-                currentStageIndex--;
-                renderStage();
-            } else {
-                // 在進入下一階段或顯示結果前，檢查當前階段所有問題是否都已回答
-                const currentStageQuestions = stages[currentStageIndex].questions;
-                let allAnswered = true;
-                for (let i = 0; i < currentStageQuestions.length; i++) {
-                    const globalIndex = getQuestionGlobalIndex(currentStageIndex, i);
-                    if (userAnswers[globalIndex] === undefined) {
-                        allAnswered = false;
-                        break;
-                    }
-                }
-
-                if (!allAnswered) {
-                    alert('請回答本階段所有問題後再進入下一階段！');
-                    return;
-                }
-
-                if (direction === 'next') {
-                    currentStageIndex++;
-                    renderStage();
-                } else if (direction === 'result') {
-                    calculateAndShowResult();
-                }
-            }
-        }
-
-        // 根據用戶答案重新計算所有分數
-        function recalculateScores() {
-            // 重置所有分數
-            mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-
-            // 遍歷所有階段的所有問題，根據 userAnswers 累計分數
-            let globalQuestionCounter = 0;
-            stages.forEach(stage => {
-                stage.questions.forEach((qData) => {
-                    const selectedOptionIndex = userAnswers[globalQuestionCounter];
-                    if (selectedOptionIndex !== undefined) {
-                        const selectedOption = qData.options[selectedOptionIndex];
-                        // 累計 MBTI 分數
-                        const mbtiImpact = selectedOption.scores.mbti;
-                        for (const char in mbtiImpact) {
-                            mbtiScores[char] += mbtiImpact[char];
-                        }
-                        // 累計九型人格分數
-                        const enneagramImpact = selectedOption.scores.enneagram;
-                        for (const type in enneagramImpact) {
-                            enneagramScores[type] += enneagramImpact[type];
-                        }
-                    }
-                    globalQuestionCounter++;
-                });
-            });
-        }
-
-        // 輔助函數：獲取問題在總問題列表中的全局索引
-        function getQuestionGlobalIndex(stageIndex, questionIndexInStage) {
-            let globalIndex = 0;
-            for (let i = 0; i < stageIndex; i++) {
-                globalIndex += stages[i].questions.length;
-            }
-            globalIndex += questionIndexInStage;
-            return globalIndex;
-        }
-
-
-        // 計算最終 MBTI 類型
-        function calculateMBTI() {
-            let mbtiType = "";
-            mbtiType += (mbtiScores.E >= mbtiScores.I) ? 'E' : 'I';
-            mbtiType += (mbtiScores.S >= mbtiScores.N) ? 'S' : 'N';
-            mbtiType += (mbtiScores.T >= mbtiScores.F) ? 'T' : 'F';
-            mbtiType += (mbtiScores.J >= mbtiScores.P) ? 'J' : 'P';
-            return mbtiType;
-        }
-
-        // 計算最終九型人格類型
-        function calculateEnneagram() {
-            let maxScore = -1;
-            let finalEnneagramType = '未知';
-
-            const enneagramEntries = Object.entries(enneagramScores);
-
-            // 根據分數降序排序，如果分數相同，則按類型數字升序排序 (例如 1 優先於 7)
-            enneagramEntries.sort((a, b) => {
-                if (b[1] === a[1]) {
-                    return parseInt(a[0]) - parseInt(b[0]); // 分數相同時，數字小的優先
-                }
-                return b[1] - a[1]; // 分數高的優先
-            });
-
-            if (enneagramEntries.length > 0) {
-                finalEnneagramType = enneagramEntries[0][0]; // 取分數最高（或並列最高中數字最小）的類型
-            }
-
-            return finalEnneagramType + '號';
-        }
-
-        // 顯示結果
-        function calculateAndShowResult() {
-            recalculateScores(); // 在顯示結果前重新計算所有分數
-
-            quizContainer.classList.add('hidden');
-            introDisclaimer.classList.add('hidden'); // 隱藏首頁免責聲明
-            resultContainer.classList.remove('hidden'); // 顯示結果頁 (包含其內部的免責聲明)
-            window.scrollTo(0, 0); // 捲動到頁面頂部
-
-            const finalMBTI = calculateMBTI();
-            const finalEnneagram = calculateEnneagram();
-            console.log("最終 MBTI 類型: ", finalMBTI);
-            console.log("最終九型人格類型: ", finalEnneagram);
-            console.log("MBTI 原始分數: ", mbtiScores);
-            console.log("九型人格原始分數: ", enneagramScores);
-
-            let finalFoodPersonalityKey;
-
-            // 更複雜的食物人格判斷邏輯，結合 MBTI 和九型人格傾向
-            // 這裡可以加入更多判斷條件，讓結果更精準和有趣
-            // 範例：
-            if (mbtiScores.E > mbtiScores.I && enneagramScores[7] > enneagramScores[4]) {
-                finalFoodPersonalityKey = 'popcorn'; // 外向、享樂主義
-            } else if (mbtiScores.I > mbtiScores.E && enneagramScores[5] > enneagramScores[1]) {
-                finalFoodPersonalityKey = 'blackCoffee'; // 內向、分析、追求知識
-            } else if (mbtiScores.F > mbtiScores.T && enneagramScores[2] > enneagramScores[9]) {
-                finalFoodPersonalityKey = 'tofuPudding'; // 情感、助人、溫和
-            } else if (mbtiScores.S > mbtiScores.N && enneagramScores[1] > enneagramScores[8]) {
-                finalFoodPersonalityKey = 'grilledCheeseSandwich'; // 實際、務實、可靠
-            } else if (mbtiScores.N > mbtiScores.S && enneagramScores[4] > enneagramScores[7]) {
-                 finalFoodPersonalityKey = 'macaron'; // 直覺、獨特、創意
-            } else if (enneagramScores[8] > enneagramScores[3] && mbtiScores.T > mbtiScores.F) {
-                finalFoodPersonalityKey = 'cheeseFondue'; // 掌控、力量，偏思考型
-            } else if (enneagramScores[6] > enneagramScores[9] && mbtiScores.J > mbtiScores.P) {
-                finalFoodPersonalityKey = 'roastedSweetPotato'; // 忠誠、安全感，偏判斷型
-            } else if (enneagramScores[9] > enneagramScores[6] && mbtiScores.F > mbtiScores.T) {
-                 finalFoodPersonalityKey = 'cottonCandy'; // 和平、逃避衝突，偏情感型
-            } else if (mbtiScores.I > mbtiScores.E && mbtiScores.T > mbtiScores.F && enneagramScores[5] > enneagramScores[9]) {
-                finalFoodPersonalityKey = 'zucchini'; // 內向、思考、觀察者
-            }
-            else {
-                // 如果沒有明確符合上述規則，則根據 MBTI 主要傾向和九型人格的次要傾向進行判斷
-                // 這部分可以進一步細化，確保所有組合都能落到一個食物人格
-                if (finalMBTI.includes('E') && finalMBTI.includes('P')) {
-                    finalFoodPersonalityKey = 'popcorn'; // 外向、感知型，熱愛自由
-                } else if (finalMBTI.includes('I') && finalMBTI.includes('J')) {
-                    finalFoodPersonalityKey = 'blackCoffee'; // 內向、判斷型，沉穩理性
-                } else if (finalMBTI.includes('F') && finalMBTI.includes('S')) {
-                    finalFoodPersonalityKey = 'tofuPudding'; // 情感、實感型，溫和體貼
-                } else if (finalMBTI.includes('T') && finalMBTI.includes('N')) {
-                    finalFoodPersonalityKey = 'zucchini'; // 思考、直覺型，分析深度
-                } else if (finalMBTI.includes('E') && finalMBTI.includes('J')) {
-                    finalFoodPersonalityKey = 'cheeseFondue'; // 外向、判斷型，有組織力
-                } else if (finalMBTI.includes('I') && finalMBTI.includes('P')) {
-                    finalFoodPersonalityKey = 'cottonCandy'; // 內向、感知型，隨性夢幻
-                } else {
-                    // 作為最後的備用，如果沒有明確匹配，隨機分配
-                    const keys = Object.keys(foodPersonalities);
-                    finalFoodPersonalityKey = keys[Math.floor(Math.random() * keys.length)];
-                }
-            }
-
-
-            const matchedFood = foodPersonalities[finalFoodPersonalityKey];
-            if (!matchedFood) {
-                console.error("未找到對應的食物人格！錯誤的 key:", finalFoodPersonalityKey);
-                document.getElementById('final-food-personality').innerText = "Oooops! 發生錯誤了！";
-                document.getElementById('food-personality-description').innerText = "請稍後再試。";
-                return;
-            }
-
-            document.getElementById('final-food-personality').innerHTML = `<span class="emoji">${matchedFood.emoji}</span> ${matchedFood.name}`;
-            document.getElementById('food-personality-description').innerText = matchedFood.description;
-
-            const otherFoodKeys = allFoodKeys.filter(key => key !== finalFoodPersonalityKey);
-            const suitableFoodsKeys = getRandomElements(otherFoodKeys, Math.floor(Math.random() * 2) + 2); // 2到3個
-            const remainingFoodKeysForUnsuitable = otherFoodKeys.filter(key => !suitableFoodsKeys.includes(key));
-            const unsuitableFoodsKeys = getRandomElements(remainingFoodKeysForUnsuitable, Math.floor(Math.random() * 2) + 2); // 2到3個
-
-            const suitableFoodsList = document.getElementById('suitable-foods-with-reason');
-            suitableFoodsList.innerHTML = '';
-            if (suitableFoodsKeys.length > 0) {
-                suitableFoodsKeys.forEach(foodKey => {
-                    const compatibleFood = foodPersonalities[foodKey];
-                    if (compatibleFood) {
-                        const reason = getRandomCompatibilityReason(matchedFood.name, compatibleFood.name, '適合');
-                        const li = document.createElement('li');
-                        // 加入 emoji
-                        li.innerHTML = `<strong>${compatibleFood.name} <span class="emoji">${compatibleFood.emoji}</span></strong>：${reason}`;
-                        suitableFoodsList.appendChild(li);
-                    }
-                });
-            } else {
-                suitableFoodsList.innerHTML = '<li>目前沒有特別合拍的食物。</li>';
-            }
-
-            const unsuitableFoodsList = document.getElementById('unsuitable-foods-with-reason');
-            unsuitableFoodsList.innerHTML = '';
-            if (unsuitableFoodsKeys.length > 0) {
-                unsuitableFoodsKeys.forEach(foodKey => {
-                    const incompatibleFood = foodPersonalities[foodKey];
-                    if (incompatibleFood) {
-                        const reason = getRandomCompatibilityReason(matchedFood.name, incompatibleFood.name, '不適合');
-                        const li = document.createElement('li');
-                        // 加入 emoji
-                        li.innerHTML = `<strong>${incompatibleFood.name} <span class="emoji">${incompatibleFood.emoji}</span></strong>：${reason}`;
-                        unsuitableFoodsList.appendChild(li);
-                    }
-                });
-            } else {
-                unsuitableFoodsList.innerHTML = '<li>目前沒有特別需要多點理解的食物。</li>';
-            }
-
-            <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -1508,10 +305,11 @@
             color: var(--primary-color);
         }
 
-        .result-disclaimer {
+        /* Combined Disclaimer Style */
+        .disclaimer-text {
             font-size: 0.9em;
             color: #888;
-            margin-top: 30px;
+            margin-top: 30px; /* Adjust margin as needed */
             line-height: 1.5;
             background-color: #f9f9f9;
             padding: 15px;
@@ -1615,9 +413,6 @@
                 <input type="text" id="userNameInput" placeholder="例如：美食家小李">
             </div>
             <button id="startQuizBtn" class="button">開始測驗</button>
-            <div id="intro-disclaimer" class="result-disclaimer">
-                <p><strong>免責聲明：</strong>本測驗為趣味性質，結果僅供參考與娛樂，不具備專業心理學診斷效力。人格特質複雜多樣，請以開放的心態看待結果，並享受測驗過程！</p>
-            </div>
         </div>
 
         <div id="quiz-container" class="hidden">
@@ -1660,10 +455,10 @@
             
             <button id="saveResultImageBtn" class="button" style="background: linear-gradient(45deg, #FFD700, #FFA500);">生成結果圖片</button>
             <button id="restartQuizBtn" class="button" style="background: linear-gradient(45deg, #6c757d, #495057); margin-top: 15px;">重新測驗</button>
+        </div>
 
-            <div id="result-disclaimer" class="result-disclaimer">
-                <p><strong>免責聲明：</strong>本測驗為趣味性質，結果僅供參考與娛樂，不具備專業心理學診斷效力。人格特質複雜多樣，請以開放的心態看待結果，並享受測驗過程！</p>
-            </div>
+        <div id="disclaimer-text" class="disclaimer-text">
+            <p id="disclaimer-content"></p>
         </div>
     </div>
 
@@ -1680,8 +475,13 @@
         const quizContainer = document.getElementById('quiz-container');
         const resultContainer = document.getElementById('result-container');
         const currentStageContent = document.getElementById('current-stage-content');
-        const introDisclaimer = document.getElementById('intro-disclaimer');
-        const resultDisclaimer = document.getElementById('result-disclaimer');
+        const disclaimerText = document.getElementById('disclaimer-text'); // The single disclaimer container
+        const disclaimerContent = document.getElementById('disclaimer-content'); // The content paragraph within the disclaimer
+
+        // Disclaimer Texts
+        const introDisclaimerHTML = '<strong>免責聲明：</strong>本測驗為趣味性質，結果僅供參考與娛樂，不具備專業心理學診斷效力。人格特質複雜多樣，請以開放的心態看待結果，並享受測驗過程！';
+        const resultDisclaimerHTML = '<strong>免責聲明：</strong>本測驗結果僅供趣味參考，不應作為嚴肅判斷。您的食物人格與匹配夥伴是透過本測驗的獨特邏輯推導，請以輕鬆愉快的心情看待。';
+
 
         // Global Variables
         let userName = '';
@@ -1694,83 +494,211 @@
         // Example structure (you'll replace this with your actual data)
         const stages = [
             {
-                intro: "<h3>第一階段：你的日常能量來源</h3><p>你更傾向於從哪裡獲得能量？</p>",
+                intro: "✨ **階段一：初登場與自我適應** ✨<br>歡迎來到食物生存大賽！你剛發現自己變成了一塊食物。這第一個階段將探索你在全新環境下的初始反應和如何適應這個奇妙的新身份。",
                 questions: [
                     {
-                        question: "當你需要充電時，你會：",
+                        question: "1. 一覺醒來，你發現自己變成了一塊食物，你的第一反應？",
                         options: [
-                            { text: "參加熱鬧的聚會，與朋友暢聊。", scores: { mbti: { E: 1 }, enneagram: { 7: 1 } } },
-                            { text: "獨自一人，享受安靜的時光，例如閱讀或冥想。", scores: { mbti: { I: 1 }, enneagram: { 5: 1 } } }
+                            { text: "先觀察周圍環境，不慌不忙", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 5: 2, 6: 1 } } },
+                            { text: "「也太好玩了吧！」立刻想拍 vlog", scores: { mbti: { E: 2, N: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } },
+                            { text: "馬上擬定逃脫計畫", scores: { mbti: { I: 1, N: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
+                            { text: "淡淡地接受命運，感嘆人生多變", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } }
                         ]
                     },
                     {
-                        question: "在一個派對上，你通常是：",
+                        question: "2. 在這個全新的食物世界，你需要向一群陌生食物自我介紹，你會？",
                         options: [
-                            { text: "活躍的交流者，結識新朋友。", scores: { mbti: { E: 1 }, enneagram: { 3: 1 } } },
-                            { text: "觀察者，與熟悉的朋友深入交談。", scores: { mbti: { I: 1 }, enneagram: { 9: 1 } } }
+                            { text: "熱情開場，還幫別人介紹", scores: { mbti: { E: 2, F: 1 }, enneagram: { 2: 2, 7: 1 } } },
+                            { text: "簡短講完就想快閃", scores: { mbti: { I: 2, T: 1 }, enneagram: { 5: 2, 6: 1 } } },
+                            { text: "講得很哲學，希望有人懂你", scores: { mbti: { I: 1, N: 1, F: 2 }, enneagram: { 4: 2, 9: 1 } } },
+                            { text: "偷偷觀察其他人如何做再行動", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
                         ]
-                    }
+                    },
+                    {
+                        question: "3.你最希望自己成為怎樣的食物，會讓大家記住你？",
+                        options: [
+                            { text: "有愛心且被大家需要", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 2: 2, 9: 1 } } },
+                            { text: "勇敢且成就非凡", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
+                            { text: "獨特且充滿創意", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
+                            { text: "安穩可靠，值得信賴", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 6: 2, 1: 1 } } }
+                        ]
+                    },
                 ]
             },
             {
-                intro: "<h3>第二階段：你的資訊處理方式</h3><p>你更注重實際細節還是抽象概念？</p>",
+                intro: "🤝 **階段二：團隊組建與初次挑戰** 🤝<br>在食物世界裡，合作是生存之道。你將與其他食物組成隊伍，共同面對料理任務。這個階段考驗你的領導、協作與應變能力。",
                 questions: [
                     {
-                        question: "面對新資訊，你更傾向於：",
+                        question: "4. 面對即將到來的團隊挑戰，你會選擇在隊伍中扮演什麼角色？",
                         options: [
-                            { text: "關注具體的數據、事實和細節。", scores: { mbti: { S: 1 }, enneagram: { 1: 1 } } },
-                            { text: "探索背後的意義、模式和可能性。", scores: { mbti: { N: 1 }, enneagram: { 4: 1 } } }
+                            { text: "隊伍裡的助手，協助大家", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
+                            { text: "領導者，掌握全局", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
+                            { text: "觀察者，冷靜分析", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 1: 1 } } },
+                            { text: "自由行動者，靈活應變", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 7: 2, 8: 1 } } }
                         ]
                     },
                     {
-                        question: "描述一棵樹時，你會：",
+                        question: "5. 隊伍中，你被選為隊長，要帶領大家完成一個困難的料理任務，你會？",
                         options: [
-                            { text: "具體描述它的葉子形狀、樹皮紋理和高度。", scores: { mbti: { S: 1 }, enneagram: { 6: 1 } } },
-                            { text: "聯想到它作為生態系統的支撐，或它在不同季節的象徵意義。", scores: { mbti: { N: 1 }, enneagram: { 7: 1 } } }
+                            { text: "公開表決，大家說了算", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 9: 2, 2: 1 } } },
+                            { text: "親自規劃戰術與分工", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
+                            { text: "默默完成最多事情但不爭功", scores: { mbti: { I: 1, S: 2, T: 1, P: 1 }, enneagram: { 6: 2, 5: 1 } } },
+                            { text: "用故事鼓舞大家的心", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 7: 1 } } }
                         ]
-                    }
+                    },
+                    {
+                        question: "6. 評審說你很像「甜點系」食物，這會影響你的隊伍分工，你怎麼回應？",
+                        options: [
+                            { text: "「謝謝誇獎，我也覺得我很香！」", scores: { mbti: { E: 2, S: 1, F: 1, P: 1 }, enneagram: { 3: 2, 7: 1 } } },
+                            { text: "「我其實是鹹的，別誤會我了」", scores: { mbti: { I: 1, S: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
+                            { text: "「你覺得像甜的，是因為你不懂我。」", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } },
+                            { text: "「那我就來發揮甜點的最大價值！」", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "7. 比賽中遇到一個關鍵選擇，你的隊伍需要決定下一步策略，你通常怎麼做？",
+                        options: [
+                            { text: "分析利弊再決定", scores: { mbti: { I: 1, N: 2, T: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
+                            { text: "聽從直覺與情緒", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
+                            { text: "問朋友大家意見如何", scores: { mbti: { E: 1, S: 1, F: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } },
+                            { text: "先衝再說，之後再調整", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 7: 2, 8: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "8.「食物界大戰」的號角即將吹響，你們隊伍準備怎麼應對這場決賽？",
+                        options: [
+                            { text: "仔細計畫與準備", scores: { mbti: { I: 2, S: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
+                            { text: "隨遇而安，適應環境", scores: { mbti: { I: 1, S: 2, P: 1 }, enneagram: { 6: 2, 9: 1 } } },
+                            { text: "組織團隊，發揮合作", scores: { mbti: { E: 2, N: 1, F: 1, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
+                            { text: "衝鋒陷陣，勇往直前", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
+                        ]
+                    },
                 ]
             },
             {
-                intro: "<h3>第三階段：你的決策模式</h3><p>你做決定時更傾向於邏輯分析還是人際和諧？</p>",
+                intro: "🧠 **階段三：賽中突發狀況與人際處理** 🧠<br>比賽中總是充滿變數，人際關係也複雜多變。你將面對突發狀況和人際考驗，你的反應和處理方式將決定你的食物人格走向。",
                 questions: [
                     {
-                        question: "做重要決定時，你通常會：",
+                        question: "9. 比賽期間，你發現有敵隊的食物作弊，但他們成績斐然，你會？",
                         options: [
-                            { text: "客觀分析利弊，重視邏輯和效率。", scores: { mbti: { T: 1 }, enneagram: { 8: 1 } } },
-                            { text: "考慮對他人的影響，重視價值觀和情感。", scores: { mbti: { F: 1 }, enneagram: { 2: 1 } } }
+                            { text: "錄影檢舉，公平最重要", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
+                            { text: "私下找他談談，勸他坦白", scores: { mbti: { I: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
+                            { text: "默默記下來，但不出聲", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 9: 1 } } },
+                            { text: "想說這只是遊戲，何必較真", scores: { mbti: { E: 1, S: 2, F: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } }
                         ]
                     },
                     {
-                        question: "在衝突中，你更傾向於：",
+                        question: "10. 評審突然要求你進行一場即興的「食材搭配表演」，你會？",
                         options: [
-                            { text: "找出問題的根源並尋求理性解決方案。", scores: { mbti: { T: 1 }, enneagram: { 1: 1 } } },
-                            { text: "關注維護關係和理解他人的感受。", scores: { mbti: { F: 1 }, enneagram: { 9: 1 } } }
+                            { text: "大膽表演，成為焦點", scores: { mbti: { E: 2, S: 1, P: 1 }, enneagram: { 3: 2, 7: 1 } } },
+                            { text: "謹慎準備，求完美", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
+                            { text: "發揮創意，玩出新花樣", scores: { mbti: { E: 1, N: 2, P: 1 }, enneagram: { 7: 2, 4: 1 } } },
+                            { text: "保持冷靜，穩穩完成", scores: { mbti: { I: 1, S: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
                         ]
-                    }
+                    },
+                    {
+                        question: "11.你的隊友「玻璃心起司鍋」因為表現不佳而情緒崩潰，你會？",
+                        options: [
+                            { text: "讓他哭一哭再抱抱", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 2: 2, 9: 1 } } },
+                            { text: "直接告訴他「你要堅強一點！」", scores: { mbti: { E: 1, S: 2, T: 1, J: 1 }, enneagram: { 1: 2, 8: 1 } } },
+                            { text: "請別人幫我處理，我不想被情緒勒索", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 4: 1 } } },
+                            { text: "陪他畫畫聊聊天，轉移情緒", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 7: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "12. 有同隊的食物搶走了你精心準備的「創意點子」的功勞，你會？",
+                        options: [
+                            { text: "直接對質，維護自己的權益", scores: { mbti: { E: 1, S: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
+                            { text: "心裡不滿，但選擇忍耐", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 9: 2, 6: 1 } } },
+                            { text: "試著轉移注意力，避免衝突", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 2: 2, 7: 1 } } },
+                            { text: "暗自努力證明自己更強", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 1: 2, 3: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "13. 你的隊友在某個環節不幸被淘汰了，你會？",
+                        options: [
+                            { text: "立刻安慰並幫忙", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 2: 2, 6: 1 } } },
+                            { text: "默默感到難過，自己也陷入低潮", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 9: 1 } } },
+                            { text: "迅速調整策略，繼續前進", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
+                            { text: "覺得是自然淘汰，沒什麼大不了", scores: { mbti: { I: 1, S: 2, T: 1, P: 1 }, enneagram: { 5: 2, 1: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "14. 你發現你暗戀的「米其林主廚」（或其他角色）是敵隊的關鍵人物…？",
+                        options: [
+                            { text: "想辦法和他私下聯絡", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 2: 1 } } },
+                            { text: "隱藏情感，專注比賽", scores: { mbti: { I: 2, S: 1, T: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
+                            { text: "苦惱又矛盾，心情複雜", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 6: 1 } } },
+                            { text: "覺得這是有趣的挑戰", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
+                        ]
+                    },
                 ]
             },
             {
-                intro: "<h3>第四階段：你的生活態度</h3><p>你喜歡有計劃還是隨性而為？</p>",
+                intro: "🔥 **階段四：壓力與自省** 🔥<br>比賽進入白熱化階段，壓力和挑戰接踵而來。這個階段將深入你的內心，探索你如何在壓力下自我反思，以及你最珍視的價值。",
                 questions: [
                     {
-                        question: "對於即將到來的週末，你傾向於：",
+                        question: "15. 比賽進入最終衝刺，你突然遇到一個預料之外的「食材變質」危機，你的反應是？",
                         options: [
-                            { text: "提前規劃好所有活動和時間表。", scores: { mbti: { J: 1 }, enneagram: { 1: 1 } } },
-                            { text: "保持開放，隨時根據心情和機會做決定。", scores: { mbti: { P: 1 }, enneagram: { 7: 1 } } }
+                            { text: "立刻想辦法應對並幫助他人", scores: { mbti: { E: 1, N: 1, F: 2, J: 1 }, enneagram: { 6: 2, 2: 1 } } },
+                            { text: "躲起來思考哪裡最安全", scores: { mbti: { I: 2, N: 1, T: 1, P: 1 }, enneagram: { 5: 2, 9: 1 } } },
+                            { text: "「這可能是命運的考驗…」開始自省", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 1: 1 } } },
+                            { text: "「燃燒吧！我就是火焰！」（勇敢面對危機）", scores: { mbti: { E: 1, S: 2, P: 1 }, enneagram: { 8: 2, 7: 1 } } }
                         ]
                     },
                     {
-                        question: "你的工作空間通常是：",
+                        question: "16. 比賽間隙的短暫休息時間，你會如何利用來「充電」？",
                         options: [
-                            { text: "整潔有序，所有物品都有固定位置。", scores: { mbti: { J: 1 }, enneagram: { 6: 1 } } },
-                            { text: "充滿靈活性，物品可能隨處可見，但你知道它們在哪。", scores: { mbti: { P: 1 }, enneagram: { 5: 1 } } }
+                            { text: "獨自沉思，充電休息", scores: { mbti: { I: 2, N: 1, T: 1, J: 1 }, enneagram: { 5: 2, 1: 1 } } },
+                            { text: "熱鬧社交，認識新朋友", scores: { mbti: { E: 2, S: 1, P: 1 }, enneagram: { 7: 2, 3: 1 } } },
+                            { text: "和熟悉的人聊聊天", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 9: 2, 6: 1 } } },
+                            { text: "做點喜歡的小事情放鬆", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 4: 2, 5: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "17. 在這場食物生存大賽中，你最害怕失去什麼？",
+                        options: [
+                            { text: "被忽視與遺忘", scores: { mbti: { I: 1, N: 1, F: 2, P: 1 }, enneagram: { 4: 2, 2: 1 } } },
+                            { text: "失控和混亂", scores: { mbti: { E: 1, S: 1, T: 2, P: 1 }, enneagram: { 8: 2, 1: 1 } } },
+                            { text: "無用與被拒絕", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 1: 2, 3: 1 } } },
+                            { text: "孤獨與被排斥", scores: { mbti: { I: 1, S: 1, F: 2, J: 1 }, enneagram: { 6: 2, 9: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "18. 在一場激烈的「食物理念辯論」中，評審問你：「你作為食物，你存在的意義是？」你說？",
+                        options: [
+                            { text: "「為了讓別人開心、被喜歡！」", scores: { mbti: { E: 1, N: 1, F: 2, P: 1 }, enneagram: { 2: 2, 7: 1 } } },
+                            { text: "「為了完成使命，挑戰極限。」", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 3: 1 } } },
+                            { text: "「沒有意義，但我會自己創造。」", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 5: 1 } } },
+                            { text: "我是提供解決方案的那個人。」", scores: { mbti: { I: 1, S: 1, T: 2, J: 1 }, enneagram: { 5: 2, 1: 1 } } }
+                        ]
+                    },
+                ]
+            },
+            {
+                intro: "🏆 **階段五：決賽與最終定論** 🏆<br>恭喜你來到最後一個階段！所有的努力都將在這一刻得到定義。你的選擇將引導你揭示你的終極食物人格，並展望你的風味未來。",
+                questions: [
+                    {
+                        question: "19. 經過這場風味大戰的洗禮，如果可以選擇「風味重生」，你會選擇成為怎樣的食物？",
+                        options: [
+                            { text: "沒人認得我，我可以重新定義自己", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
+                            { text: "功能強大、受人倚賴的角色", scores: { mbti: { E: 1, S: 1, T: 2, J: 1 }, enneagram: { 3: 2, 8: 1 } } },
+                            { text: "可愛又有人保護我", scores: { mbti: { I: 1, S: 1, F: 2, P: 1 }, enneagram: { 6: 2, 2: 1 } } },
+                            { text: "跟現在一樣，我覺得我不錯", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 9: 2, 1: 1 } } }
+                        ]
+                    },
+                    {
+                        question: "20. 最終評審對你進行了定義，宣布你屬於某種「食物人格」。你的反應是？",
+                        options: [
+                            { text: "接受這個定義，努力做好自己", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 9: 2, 6: 1 } } },
+                            { text: "挑戰評審，證明自己不同", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
+                            { text: "重新定義自己，開創新路", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
+                            { text: "笑看結果，隨緣自在", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 9: 1 } } }
                         ]
                     }
                 ]
             }
         ];
-
         // Define food personalities (replace with your actual data)
         const foodPersonalities = {
             popcorn: { 
@@ -1829,13 +757,30 @@
         restartQuizBtn.addEventListener('click', restartQuiz);
         saveResultImageBtn.addEventListener('click', saveResultImage);
 
+        // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            showIntroScreen();
+        });
+
+        // Function to show intro screen and initial disclaimer
+        function showIntroScreen() {
+            introContainer.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            disclaimerText.classList.remove('hidden'); // Ensure disclaimer is visible
+            disclaimerContent.innerHTML = introDisclaimerHTML; // Set intro disclaimer content
+            userNameInput.value = ''; // Clear username input
+            userName = ''; // Clear username variable
+            window.scrollTo(0, 0); // Scroll to top
+        }
+
         // Start Quiz
         function startQuiz() {
             userName = userNameInput.value.trim();
             
             introContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
-            introDisclaimer.classList.add('hidden'); // Hide intro disclaimer
+            disclaimerText.classList.add('hidden'); // Hide disclaimer during quiz
 
             currentStageIndex = 0;
             userAnswers = {}; // Reset all answers
@@ -2053,8 +998,9 @@
             recalculateScores(); // Recalculate all scores before displaying results
 
             quizContainer.classList.add('hidden');
-            introDisclaimer.classList.add('hidden'); // Hide intro disclaimer
-            resultContainer.classList.remove('hidden'); // Show result page (including its internal disclaimer)
+            resultContainer.classList.remove('hidden');
+            disclaimerText.classList.remove('hidden'); // Ensure disclaimer is visible
+            disclaimerContent.innerHTML = resultDisclaimerHTML; // Set result disclaimer content
             window.scrollTo(0, 0); // Scroll to top
 
             const finalMBTI = calculateMBTI();
@@ -2162,39 +1108,24 @@
             // Set up event listeners for feedback buttons
             const feedbackButtons = document.querySelectorAll('#feedback-section .feedback-buttons button');
             feedbackButtons.forEach(button => {
-                // Remove previous listeners to prevent multiple bindings on re-render
-                // IMPORTANT: Use a named function or a reference to the specific listener to remove it correctly.
-                // For anonymous functions in addEventListener, you can't directly remove them this way.
-                // A better approach is to remove and re-append the feedback section or use a flag.
-                // For simplicity here, we'll ensure they are reset.
-                
                 // Reset button state
                 button.classList.remove('active');
                 button.disabled = false;
 
                 // Create a new event listener. This ensures the correct closure for matchedFood.name, finalMBTI, finalEnneagram
-                const newFeedbackListener = (event) => {
-                    handleFeedback(event.target.dataset.feedback, event.target, matchedFood.name, finalMBTI, finalEnneagram);
-                };
-                // Remove any existing listeners by cloning and replacing the node
+                // Clone and replace to remove old listeners effectively
                 const oldButton = button;
                 const newButton = oldButton.cloneNode(true);
                 oldButton.parentNode.replaceChild(newButton, oldButton);
-                newButton.addEventListener('click', newFeedbackListener);
+                newButton.addEventListener('click', (event) => {
+                    handleFeedback(event.target.dataset.feedback, event.target, matchedFood.name, finalMBTI, finalEnneagram);
+                });
             });
         }
 
         // Restart Quiz
         function restartQuiz() {
-            // Re-fetch DOM elements as they might have been replaced by saveResultImage
-            const initialRestartBtn = document.getElementById('restartQuizBtn');
-            if (initialRestartBtn) {
-                initialRestartBtn.removeEventListener('click', restartQuiz);
-            }
-            
-            // Re-create the main structure if it was changed by saveResultImage
-            // A more robust solution might involve saving the initial HTML and restoring it
-            // For now, we'll just reload the page to ensure a clean state
+            // Reload the page for a clean restart
             location.reload(); 
         }
 
@@ -2250,12 +1181,14 @@
             
             // Find feedback section and store its original display state
             const feedbackSection = document.getElementById('feedback-section');
-            const feedbackSectionDisplay = feedbackSection ? feedbackSection.style.display : 'block'; // Default to block if not found (error state)
+            // Hide the single disclaimer text as well
+            const originalDisclaimerDisplay = disclaimerText.style.display;
 
             // Temporarily hide elements that shouldn't be in the screenshot
             if (feedbackSection) feedbackSection.style.display = 'none';
             saveResultImageBtn.classList.add('hidden'); // Hide the save button itself
             restartQuizBtn.classList.add('hidden'); // Hide the original restart button
+            disclaimerText.style.display = 'none'; // Hide the disclaimer for screenshot
 
             // Adjust styles for optimal screenshot
             document.body.style.overflow = 'hidden'; // Prevent scrollbar from affecting screenshot
@@ -2325,47 +1258,21 @@
                 buttonContainer.appendChild(newRestartBtn);
                 resultElement.appendChild(buttonContainer);
 
-                // No need to remove old buttons here as we will reload on restart quiz
-                // The original feedback section will also be removed by clearing resultElement.innerHTML
-                // We are intentionally replacing the content to show the image directly.
             }).catch(error => {
                 // Remove loading message
                 document.body.removeChild(loadingMessage);
                 console.error("圖片儲存失敗：", error);
                 alert("圖片生成失敗，請重試或檢查瀏覽器權限。\n錯誤訊息: " + error.message);
             }).finally(() => {
-                // Restore original styles
+                // Restore original styles (except for the elements that were intentionally replaced/re-added)
                 document.body.style.overflow = originalBodyOverflow;
                 containerElement.style.padding = originalContainerPadding;
                 containerElement.style.boxShadow = originalContainerShadow;
                 containerElement.style.setProperty('-webkit-mask', originalContainerMask);
                 containerElement.style.setProperty('mask-composite', originalContainerMaskComposite);
                 
-                // IMPORTANT FIX: Re-show the original feedback section and buttons if needed
-                // If the feedback section was removed by `resultElement.innerHTML = '';`
-                // then you need to recreate it or ensure it's not removed in the first place
-                // For `saveResultImage`, the intent seems to be to *replace* the content with the image.
-                // If you want the feedback section to remain visible *after* showing the image,
-                // you would need to either:
-                // 1. Move the feedback section outside the `result-container` (recommended if it's always visible).
-                // 2. Append the feedback section *back* to the `result-container` after `resultElement.innerHTML = '';` and before `resultElement.appendChild(img);`.
-                // 3. For the purpose of *screenshotting*, temporarily hide it, then always restore it.
-                //
-                // Given the current structure where `resultElement.innerHTML = '';` clears everything,
-                // the `feedbackSection.style.display = feedbackSectionDisplay;` in the `finally` block
-                // attempts to restore the display of a *removed* element, which won't work.
-                // The buttons `saveResultImageBtn` and `restartQuizBtn` are also handled by recreating them.
-                //
-                // To address this, I've changed `restartQuiz` to reload the page for simplicity and a clean state.
-                // If you want to remain on the page and switch between result view and image view without reloading,
-                // the HTML structure would need to be re-evaluated to better isolate parts.
-
-                // For the screenshot scenario, the feedback buttons are intended to be hidden.
-                // When the image is displayed, new buttons (download and restart) are added.
-                // The *original* feedback section and its buttons are not intended to be shown with the image.
-                // Therefore, the line `feedbackSection.style.display = feedbackSectionDisplay;` in the finally block
-                // for the original `saveResultImageBtn` is incorrect given `resultElement.innerHTML = '';` earlier.
-                // I've removed that problematic line from this `finally` block.
+                // Restore the disclaimer's display state only if it was hidden for screenshot
+                disclaimerText.style.display = originalDisclaimerDisplay;
             });
         }
 
