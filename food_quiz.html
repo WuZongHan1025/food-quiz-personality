@@ -488,6 +488,13 @@
                 font-size: 1.05em;
                 padding: 12px;
             }
+            .feedback-buttons button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+                min-width: unset; /* 移除最小寬度限制 */
+                max-width: unset;
+                flex-basis: auto; /* 自動調整寬度 */
+            }
             .disclaimer {
                 max-width: 550px;
             }
@@ -566,7 +573,7 @@
                 <input type="text" id="userName" placeholder="請輸入你的姓名">
             </div>
             <button id="startQuizBtn" class="stage-nav-btn">開始測驗</button>
-            <div class="disclaimer" id="mainDisclaimer">
+            <div class="disclaimer" id="introDisclaimer">
                 <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
             </div>
         </div>
@@ -589,6 +596,9 @@
                 <h3>需要多點理解的食物</h3>
                 <ul id="unsuitable-foods-with-reason"></ul>
             </div>
+            <div class="disclaimer" id="resultDisclaimer">
+                <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
+            </div>
             <p style="margin-top:25px;"><strong>你覺得這個測驗結果符合你嗎？</strong></p>
             <div class="feedback-buttons">
                 <button data-feedback="yes">非常符合！</button>
@@ -597,7 +607,7 @@
             </div>
             <button id="saveResultImage" class="stage-nav-btn">儲存結果為圖片</button>
             <button id="restartQuizBtn" class="stage-nav-btn">重新測驗</button>
-            </div>
+        </div>
     </div>
 
 
@@ -845,7 +855,8 @@
         const nextStageBtn = document.getElementById('nextStageBtn');
         const restartQuizBtn = document.getElementById('restartQuizBtn');
         const saveResultImageBtn = document.getElementById('saveResultImage');
-        const mainDisclaimer = document.getElementById('mainDisclaimer');
+        const introDisclaimer = document.getElementById('introDisclaimer'); // 首頁免責聲明
+        const resultDisclaimer = document.getElementById('resultDisclaimer'); // 結果頁免責聲明
         const userNameInput = document.getElementById('userName'); // 姓名輸入框
 
         // 事件監聽器
@@ -857,14 +868,14 @@
 
         // 啟動測驗
         function startQuiz() {
-            userName = userNameInput.value.trim(); // 獲取用戶姓名
+            userName = userNameInput.value.trim();
             
-            introContainer.classList.add('hidden'); // 隱藏起始頁
-            quizContainer.classList.remove('hidden'); // 顯示測驗頁
-            mainDisclaimer.classList.add('hidden'); // 隱藏免責聲明
+            introContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            introDisclaimer.classList.add('hidden'); // 隱藏首頁免責聲明
+
             currentStageIndex = 0;
             userAnswers = {}; // 重置所有答案
-            // 重置所有分數
             mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
             enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
             renderStage();
@@ -885,7 +896,6 @@
             // 遍歷當前階段的所有問題
             currentStage.questions.forEach((qData, qIndexInStage) => {
                 // 計算這個問題在 `questions` 總列表中的實際索引
-                // 需要一個方法來找出這個問題在總問題列表中的實際 index
                 const questionGlobalIndex = getQuestionGlobalIndex(currentStageIndex, qIndexInStage);
 
                 const questionBlock = document.createElement('div');
@@ -1081,8 +1091,8 @@
             recalculateScores(); // 在顯示結果前重新計算所有分數
 
             quizContainer.classList.add('hidden');
-            resultContainer.classList.remove('hidden');
-            mainDisclaimer.classList.remove('hidden'); // 顯示免責聲明 (如果結果頁需要)
+            introDisclaimer.classList.add('hidden'); // 隱藏首頁免責聲明
+            resultContainer.classList.remove('hidden'); // 顯示結果頁 (包含其內部的免責聲明)
             window.scrollTo(0, 0); // 捲動到頁面頂部
 
             const finalMBTI = calculateMBTI();
@@ -1215,7 +1225,9 @@
         function restartQuiz() {
             resultContainer.classList.add('hidden');
             introContainer.classList.remove('hidden');
-            mainDisclaimer.classList.remove('hidden'); // 確保重新開始時免責聲明顯示
+            introDisclaimer.classList.remove('hidden'); // 確保重新開始時首頁免責聲明顯示
+            resultDisclaimer.classList.add('hidden'); // 隱藏結果頁免責聲明
+
             currentStageIndex = 0;
             userAnswers = {};
             userNameInput.value = ''; // 清空姓名欄
@@ -1266,29 +1278,30 @@
         // 儲存圖片功能
         function saveResultImage() {
             const resultElement = document.getElementById('result-container');
+            
+            // 儲存原始樣式
             const originalContainerPadding = document.querySelector('.container').style.padding;
             const originalContainerShadow = document.querySelector('.container').style.boxShadow;
             const originalContainerBeforeMask = document.querySelector('.container').style.getPropertyValue('-webkit-mask');
             const originalContainerBeforeMaskComposite = document.querySelector('.container').style.getPropertyValue('mask-composite');
             const originalBodyOverflow = document.body.style.overflow;
-            const originalDisclaimerDisplay = mainDisclaimer.style.display;
-
-            // 為了讓截圖效果最佳，暫時調整樣式
-            document.body.style.overflow = 'hidden'; // 避免滾動條影響截圖
-            mainDisclaimer.style.display = 'none'; // 隱藏免責聲明
-            document.querySelector('.container').style.padding = '50px'; // 增加截圖時的內邊距
-            document.querySelector('.container').style.boxShadow = 'none'; // 暫時移除陰影
-            document.querySelector('.container').style.setProperty('-webkit-mask', 'none'); // 移除漸變邊框
-            document.querySelector('.container').style.setProperty('mask-composite', 'unset');
-
-            // 暫時隱藏回饋按鈕，以便截圖
+            
+            // 暫時隱藏回饋按鈕、儲存按鈕和重新測驗按鈕
             const feedbackButtonsDiv = document.querySelector('.feedback-buttons');
             const saveResultImageBtnDisplay = saveResultImageBtn.style.display;
             const restartQuizBtnDisplay = restartQuizBtn.style.display;
+
             feedbackButtonsDiv.style.display = 'none';
             saveResultImageBtn.style.display = 'none';
             restartQuizBtn.style.display = 'none';
 
+
+            // 為了讓截圖效果最佳，暫時調整樣式
+            document.body.style.overflow = 'hidden'; // 避免滾動條影響截圖
+            document.querySelector('.container').style.padding = '50px'; // 增加截圖時的內邊距
+            document.querySelector('.container').style.boxShadow = 'none'; // 暫時移除陰影
+            document.querySelector('.container').style.setProperty('-webkit-mask', 'none'); // 移除漸變邊框
+            document.querySelector('.container').style.setProperty('mask-composite', 'unset');
 
             html2canvas(resultElement, {
                 useCORS: true,
@@ -1309,13 +1322,12 @@
             }).finally(() => {
                 // 恢復原始樣式
                 document.body.style.overflow = originalBodyOverflow;
-                mainDisclaimer.style.display = originalDisclaimerDisplay; // 恢復免責聲明顯示狀態
                 document.querySelector('.container').style.padding = originalContainerPadding;
                 document.querySelector('.container').style.boxShadow = originalContainerShadow;
                 document.querySelector('.container').style.setProperty('-webkit-mask', originalContainerBeforeMask);
                 document.querySelector('.container').style.setProperty('mask-composite', originalContainerBeforeMaskComposite);
                 
-                // 恢復回饋按鈕顯示
+                // 恢復被隱藏的元素顯示
                 feedbackButtonsDiv.style.display = 'flex'; // 根據 CSS 設置為 flex
                 saveResultImageBtn.style.display = saveResultImageBtnDisplay;
                 restartQuizBtn.style.display = restartQuizBtnDisplay;
@@ -1340,8 +1352,6 @@
                 feedback: feedbackType 
             };
 
-            // **重要：請將 'YOUR_BACKEND_API_URL' 替換為您實際部署的後端 API 網址**
-            // 例如：'https://your-food-quiz-backend.onrender.com/api/feedback'
             const backendApiUrl = 'https://food-quiz-python-backend.onrender.com/api/feedback'; 
 
             fetch(backendApiUrl, {
@@ -1353,20 +1363,15 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    // 如果 HTTP 狀態碼不是 2xx (例如 404, 500)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
                 console.log('後端回傳:', data);
-                // 您可以在這裡給使用者一個成功的提示，或在控制台顯示
-                // 例如： alert('感謝您的回饋！');
             })
             .catch((error) => {
                 console.error('發送回饋失敗:', error);
-                // 可以顯示一個更友好的失敗訊息，而非彈窗
-                // 例如： alert('回饋發送失敗，請稍後再試。');
             });
         }
     </script>
