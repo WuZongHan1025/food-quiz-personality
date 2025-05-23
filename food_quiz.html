@@ -1,653 +1,338 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>食物人格測驗</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* CSS Custom Properties for easier color management */
-        :root {
-            --primary-color: #4CAF50; /* 深綠色 */
-            --primary-light: #66BB6A; /* 淺綠色 */
-            --secondary-color: #2196F3; /* 藍色 */
-            --secondary-light: #BBDEFB; /* 淺藍色 */
-            --background-gradient-start: #eef7ff; /* 柔和淺藍 */
-            --background-gradient-end: #dceafc;    /* 稍深淺藍 */
-            --card-background: #ffffff;
-            --card-shadow: rgba(0, 0, 0, 0.15);
-            --text-dark: #333;
-            --text-medium: #555;
-            --text-light: #666;
-            --button-hover: #45a049;
-            --option-bg-light: #e0f8e0; /* 更柔和的綠色 */
-            --option-border: #a7d9a9;
-            --option-selected-bg: #c8e6c9;
-            --result-bg: #fdfdfd;
-            --result-shadow-inset: rgba(0, 0, 0, 0.03);
-            --highlight-color: #ff8a00; /* 暖橙色 */
-            --compatible-bg: #e3f2fd;
-            --compatible-border: #bbdefb;
-            --incompatible-bg: #ffe0b2; /* 柔和橙色 */
-            --incompatible-border: #ffcc80;
-        }
-
+        /* Basic CSS for demonstration. You should have your own styles. */
         body {
-            font-family: 'Noto Sans TC', 'Roboto', 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 保持 flex-start，方便捲動 */
+            align-items: flex-start;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
+            background-color: #f0f2f5;
             margin: 0;
-            padding: 30px; /* 增加整體邊距 */
+            padding: 20px;
             box-sizing: border-box;
-            color: var(--text-dark);
+            overflow-x: hidden;
+            color: #333;
             line-height: 1.6;
         }
 
         .container {
-            background-color: var(--card-background);
-            border-radius: 25px; /* 更大的圓角 */
-            box-shadow: 0 15px 40px var(--card-shadow); /* 更深的陰影 */
-            padding: 40px; /* 增加內邊距 */
-            text-align: center;
-            max-width: 750px; /* 略微增加最大寬度 */
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
             width: 100%;
-            transition: all 0.5s ease-in-out;
-            border: 2px solid rgba(255, 255, 255, 0.8); /* 輕微的白色邊框 */
-            overflow: hidden; /* 確保內容不超出圓角 */
-            position: relative; /* 為了可能的裝飾元素 */
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
+            /* Gradient border effect */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            background: linear-gradient(135deg, #FFD700, #FF69B4, #8A2BE2);
+            padding: 5px; /* Adjust padding for the border */
         }
 
-        /* 輕微的漸變邊框效果 */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 25px;
-            padding: 2px;
-            background: linear-gradient(45deg, var(--primary-light), var(--secondary-light));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none; /* 讓點擊穿透到下面的內容 */
+        .content {
+            background-color: #fff; /* Inner background for the main content */
+            padding: 35px;
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 25px;
         }
 
         .hidden {
-            display: none !important; /* 使用 !important 確保強制隱藏 */
+            display: none !important;
         }
 
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 2.8em; /* 更大的標題 */
-            letter-spacing: 1.5px;
-            font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            color: var(--text-medium);
-            font-size: 1.8em;
-            margin-bottom: 10px;
-            font-weight: 400;
-        }
-
-        h3 {
-            color: var(--secondary-color);
-            font-size: 1.6em; /* 調整結果頁標題大小 */
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--secondary-light);
-            padding-bottom: 8px;
-            font-weight: 700;
-        }
-
-        /* 調整首頁的介紹文字樣式 */
-        #intro-container .intro-text { /* 新增的 class */
-            font-size: 1.2em; /* 問題文字更大 */
-            margin: 0 auto 30px auto; /* 上下邊距，左右自動實現置中 */
-            color: var(--text-medium);
-            line-height: 1.7;
-            font-weight: 300;
-            text-align: center; /* 首頁文字置中 */
-            max-width: 80%; /* 限制寬度 */
-        }
-        /* 測驗問題的文字樣式保持不變 */
-        .question-text {
-            font-size: 1.2em; /* 問題文字更大 */
-            margin-bottom: 25px;
-            color: var(--text-medium);
-            line-height: 1.7;
-            font-weight: 300;
-            text-align: left; /* 問題文字靠左 */
-            border-left: 4px solid var(--primary-light);
-            padding-left: 15px;
-            margin-top: 30px; /* 與上方引文間距 */
-        }
-
-        .stage-intro {
-            font-size: 1.3em;
-            color: var(--secondary-color);
-            margin-bottom: 30px;
-            line-height: 1.8;
-            font-weight: 400;
+        .intro-container, .quiz-container, .result-container {
             text-align: center;
-            background-color: var(--background-gradient-start);
-            padding: 20px 25px;
-            border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-            border: 1px dashed var(--secondary-light);
         }
 
-        .question-block {
-            margin-bottom: 40px; /* 每個問題區塊的間距 */
-            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-            padding-bottom: 30px;
+        .input-group {
+            margin-bottom: 20px;
         }
 
-        .question-block:last-child {
-            border-bottom: none; /* 最後一個問題區塊沒有底線 */
-            padding-bottom: 0;
-            margin-bottom: 0;
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
 
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
 
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* 增加選項間距 */
+        .start-btn, .stage-nav-btn, .option-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .start-btn:hover, .stage-nav-btn:hover, .option-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .option-btn {
-            background-color: var(--option-bg-light);
-            color: var(--primary-color);
-            border: 1px solid var(--option-border); /* 細邊框 */
-            padding: 14px 25px; /* 增加內邊距 */
-            border-radius: 12px; /* 更大的圓角 */
-            font-size: 1.1em; /* 字體更大 */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* 更明顯的陰影 */
+            background: #e0e0e0;
+            color: #333;
+            padding: 10px 15px;
+            font-size: 1em;
+            margin: 5px;
+            width: 100%; /* Make options full width */
             text-align: left;
-            font-weight: 400;
-        }
-
-        .option-btn:hover {
-            background-color: var(--option-selected-bg);
-            transform: translateY(-3px); /* 更明顯的抬升 */
-            border-color: var(--primary-color);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            box-sizing: border-box;
         }
 
         .option-btn.selected {
-            background-color: var(--primary-light);
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
             color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            font-weight: 700; /* 選中後加粗 */
+            border: 2px solid #388E3C;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .option-btn:active {
-            transform: translateY(0);
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .stage-intro {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-left: 5px solid #4CAF50;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .question-block {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column; /* Stack options vertically */
+            gap: 10px;
         }
 
         .navigation-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 40px;
-            gap: 20px; /* 按鈕間距 */
+            margin-top: 30px;
         }
 
-        .stage-nav-btn {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light)); /* 漸變背景 */
-            color: white;
-            border: none;
-            padding: 14px 30px; /* 增加內邊距 */
-            border-radius: 10px; /* 更大的圓角 */
-            font-size: 1.15em; /* 字體更大 */
-            cursor: pointer;
-            flex-grow: 1; /* 讓按鈕平均分配空間 */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* 更明顯的陰影 */
-            font-weight: 700;
-        }
-
-        .stage-nav-btn:hover {
-            background: linear-gradient(45deg, var(--primary-light), var(--primary-color)); /* 漸變反轉 */
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .stage-nav-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* 上一階段按鈕的樣式微調 */
-        .stage-nav-btn.prev-btn {
-            background: linear-gradient(45deg, #78909C, #90A4AE); /* 不同的漸變色 */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        .stage-nav-btn.prev-btn:hover {
-            background: linear-gradient(45deg, #90A4AE, #78909C);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        /* 姓名輸入欄位 */
-        .name-input-group {
-            margin-bottom: 25px;
+        .disclaimer-text {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fffde7;
+            border-left: 5px solid #ffeb3b;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #616161;
             text-align: left;
-            padding: 0 20px; /* 讓輸入框和標籤有內邊距 */
         }
-        .name-input-group label {
-            display: block;
-            margin-bottom: 8px;
+
+        .result-display h2 {
+            color: #FF5722;
+        }
+
+        .result-display p {
             font-size: 1.1em;
-            color: var(--text-medium);
-            font-weight: 500;
+            margin-bottom: 10px;
         }
-        .name-input-group input[type="text"] {
-            width: calc(100% - 20px); /* 考慮 padding */
-            padding: 12px 10px;
-            border: 1px solid var(--option-border);
+
+        .result-display ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .result-display ul li {
+            background-color: #f0f4f8;
+            padding: 10px 15px;
             border-radius: 8px;
-            font-size: 1.1em;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        .name-input-group input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); /* 綠色光暈效果 */
-        }
-
-        /* 結果頁樣式 */
-        #result-container {
-            padding: 30px;
-            background-color: var(--result-bg);
-            border-radius: 20px;
-            box-shadow: inset 0 0 15px var(--result-shadow-inset); /* 柔和內陰影 */
-            margin-top: 20px;
-            text-align: left; /* 讓文字靠左對齊 */
-        }
-
-        #final-food-personality {
-            font-size: 4em; /* 最終食物人格字體超大 */
-            margin-bottom: 20px;
-            color: var(--highlight-color); /* 突出顏色 */
+            margin-bottom: 8px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(255, 138, 0, 0.2); /* 輕微文字陰影 */
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        #feedback-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #feedback-section h3 {
+            color: #2196F3;
+            margin-bottom: 15px;
+        }
+
+        .feedback-buttons button {
+            background-color: #90CAF9;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .feedback-buttons button.active {
+            background-color: #2196F3;
+            color: white;
+            font-weight: bold;
+        }
+
+        .feedback-buttons button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         #final-food-personality .emoji {
-            font-size: 1.8em; /* 表情符號更大 */
-            vertical-align: middle;
-        }
-
-        #food-personality-description {
-            font-size: 1.3em; /* 描述文字更大 */
-            color: var(--text-light);
-            line-height: 1.9; /* 增加行高 */
-            margin-bottom: 35px;
-            text-align: justify; /* 左右對齊 */
-            text-indent: 2.5em; /* 首行縮排 */
-            background-color: rgba(240, 248, 255, 0.6); /* 輕微背景色 */
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(var(--secondary-light), 0.5);
-        }
-
-        #compatibility-container {
-            margin-top: 40px;
-            border-top: 1px dashed #ddd;
-            padding-top: 25px;
-            text-align: left;
-        }
-
-        #compatibility-container ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 25px; /* 增加列表間距 */
-        }
-
-        #compatibility-container ul li {
-            background-color: var(--compatible-bg); /* 合拍食物的背景 */
-            border: 1px solid var(--compatible-border);
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            font-size: 1.15em;
-            line-height: 1.6;
-            color: var(--text-dark);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        #compatibility-container ul li:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        #compatibility-container ul li strong {
-            color: var(--secondary-color); /* 合拍食物名稱顏色 */
-            font-weight: bold;
-        }
-        #compatibility-container ul li strong .emoji { /* 合拍食物的 emoji 樣式 */
-            font-size: 1em;
-            vertical-align: middle;
-            margin-left: 5px; /* 稍微與文字分離 */
-        }
-
-
-        #unsuitable-foods-with-reason li {
-            background-color: var(--incompatible-bg); /* 不合拍食物的背景 */
-            border-color: var(--incompatible-border);
-        }
-
-        #unsuitable-foods-with-reason li strong {
-            color: var(--highlight-color); /* 不合拍食物名稱顏色 */
-            font-weight: bold;
-        }
-        #unsuitable-foods-with-reason li strong .emoji { /* 不合拍食物的 emoji 樣式 */
-            font-size: 1em;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
-
-        /* 回饋問卷樣式 */
-        .feedback-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap; /* 小螢幕換行 */
-        }
-        .feedback-buttons button {
-            background-color: #f0f0f0;
-            color: var(--text-medium);
-            border: 1px solid #ccc;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1; /* 讓按鈕平均分配空間 */
-            min-width: 120px; /* 最小寬度 */
-            max-width: 180px; /* 最大寬度 */
-        }
-        .feedback-buttons button:hover:not(:disabled) {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .feedback-buttons button.active {
-            background-color: var(--secondary-color);
-            color: white;
-            border-color: var(--secondary-color);
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
-            transform: translateY(-1px);
-        }
-        .feedback-buttons button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .disclaimer {
-            margin-top: 30px; /* 與上方按鈕的距離 */
-            font-size: 0.9em;
-            color: #888;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.5);
-            padding: 10px 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            backdrop-filter: blur(5px); /* 毛玻璃效果 */
-            -webkit-backdrop-filter: blur(5px);
-            width: 100%; /* 確保橫向佔滿 */
-            max-width: 650px; /* 與容器相同寬度 */
-            box-sizing: border-box; /* 包含 padding 在寬度內 */
-            margin-left: auto; /* 置中 */
-            margin-right: auto; /* 置中 */
-        }
-
-        /* 首頁容器的 Flexbox 佈局，讓內容置中 */
-        #intro-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* 水平置中 */
-            justify-content: center; /* 垂直置中 (如果空間允許) */
-            height: 100%; /* 確保佔據父容器的高度 */
-        }
-
-        /* 響應式設計調整 */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-            .container {
-                padding: 30px;
-                border-radius: 20px;
-            }
-            .container::before {
-                border-radius: 20px;
-            }
-            h1 {
-                font-size: 2.2em;
-                margin-bottom: 20px;
-            }
-            #intro-container .intro-text {
-                font-size: 1.1em;
-                margin-bottom: 20px;
-            }
-            .question-text {
-                font-size: 1.1em;
-                margin-bottom: 20px;
-                padding-left: 10px;
-            }
-            .stage-intro {
-                font-size: 1.1em;
-                padding: 15px 20px;
-            }
-            .option-btn {
-                font-size: 1.05em;
-                padding: 12px 20px;
-            }
-            .navigation-buttons {
-                flex-direction: column; /* 小螢幕下按鈕垂直排列 */
-                gap: 15px;
-            }
-            .stage-nav-btn {
-                padding: 12px 25px;
-                font-size: 1.1em;
-                /* margin-top: 0px; 這裡的 margin-top 不再需要，因為 flex-direction: column; 和 gap 已經處理了 */
-            }
-            #final-food-personality {
-                font-size: 3em;
-                gap: 10px;
-            }
-            #final-food-personality .emoji {
-                font-size: 1.5em;
-            }
-            #food-personality-description {
-                font-size: 1.1em;
-                padding: 15px;
-            }
-            #compatibility-container h3 {
-                font-size: 1.5em;
-            }
-            #compatibility-container ul li {
-                font-size: 1.05em;
-                padding: 12px;
-            }
-            .feedback-buttons button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-                min-width: unset; /* 移除最小寬度限制 */
-                max-width: unset;
-                flex-basis: auto; /* 自動調整寬度 */
-            }
-            .disclaimer {
-                max-width: 550px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            #intro-container .intro-text {
-                font-size: 0.95em;
-                margin-bottom: 15px;
-            }
-            .question-text {
-                font-size: 0.95em;
-                margin-bottom: 15px;
-            }
-            .stage-intro {
-                font-size: 1em;
-                padding: 10px 15px;
-            }
-            .option-btn {
-                font-size: 0.9em;
-                padding: 10px 15px;
-            }
-            .navigation-buttons {
-                gap: 10px;
-            }
-            .stage-nav-btn {
-                padding: 10px 20px;
-                font-size: 1em;
-            }
-            #final-food-personality {
-                font-size: 2.5em;
-                flex-direction: column; /* 小螢幕下讓 emoji 和文字垂直排列 */
-            }
-            #final-food-personality .emoji {
-                font-size: 1.3em;
-            }
-            #food-personality-description {
-                font-size: 0.95em;
-                text-indent: 1.5em;
-            }
-            #compatibility-container h3 {
-                font-size: 1.3em;
-            }
-            #compatibility-container ul li {
-                font-size: 0.9em;
-                padding: 10px;
-            }
-            .feedback-buttons button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-                min-width: unset; /* 移除最小寬度限制 */
-                max-width: unset;
-                flex-basis: auto; /* 自動調整寬度 */
-            }
-            .disclaimer {
-                margin-top: 20px;
-                padding: 8px 15px;
-                max-width: 350px;
-            }
+            font-size: 2.5em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="intro-container">
-            <h1>測測你是什麼食物人格！</h1>
-            <p class="intro-text">在繁忙的日常生活中，你是否有過一些隱藏的特質，就像不同的食物一樣，擁有獨特的風味和個性？快來測測看，你是哪種美味的食物人格！</p>
-            <div class="name-input-group">
-                <label for="userName">輸入你的暱稱 (選填):</label>
-                <input type="text" id="userName" placeholder="例如：美食家小李">
-            </div>
-            <button id="startQuizBtn" class="stage-nav-btn">開始測驗</button>
-            <div class="disclaimer" id="introDisclaimer">
-                <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
-            </div>
-        </div>
-
-        <div id="quiz-container" class="hidden">
-            <div id="current-stage-content"></div>
-            <div class="navigation-buttons">
-                <button id="prevStageBtn" class="stage-nav-btn prev-btn hidden">上一階段</button>
-                <button id="nextStageBtn" class="stage-nav-btn">下一階段</button>
-            </div>
-        </div>
-
-        <div id="result-container" class="hidden">
-            <h2>你就像...</h2>
-            <h3 id="final-food-personality"></h3>
-            <p id="food-personality-description"></p>
-            <div id="compatibility-container">
-                <h3>適合你的食物搭配</h3>
-                <ul id="suitable-foods-with-reason"></ul>
-                <h3>你可能需要避開的食物</h3>
-                <ul id="unsuitable-foods-with-reason"></ul>
-            </div>
-            <div class="disclaimer" id="resultDisclaimer">
-                <p>※ 本測驗為趣味性質，結果僅供參考與娛樂，不代表專業性格評估。</p>
-            </div>
-
-            <div id="feedback-section">
-                <p style="margin-top:25px;"><strong>你覺得這個測驗結果符合你嗎？</strong></p>
-                <div class="feedback-buttons">
-                    <button data-feedback="yes">非常符合！</button>
-                    <button data-feedback="somewhat">有點符合</button>
-                    <button data-feedback="no">不太符合</button>
+        <div class="content">
+            <div id="intro-container" class="intro-container">
+                <h1>歡迎來到食物人格測驗！</h1>
+                <p>這是一個結合MBTI與九型人格特質，為你量身打造專屬食物人格的趣味測驗。</p>
+                <div class="input-group">
+                    <label for="userNameInput">請輸入你的名字 (選填):</label>
+                    <input type="text" id="userNameInput" placeholder="例如：小明">
                 </div>
-                <button id="saveResultImage" class="stage-nav-btn">儲存結果為圖片</button>
-                <button id="restartQuizBtn" class="stage-nav-btn">重新測驗</button>
+                <button id="startQuizBtn" class="start-btn">開始測驗</button>
+            </div>
+
+            <div id="quiz-container" class="quiz-container hidden">
+                <div id="currentStageContent" class="stage-content">
+                    </div>
+                <div class="navigation-buttons">
+                    <button id="prevStageBtn" class="stage-nav-btn hidden">上一階段</button>
+                    <button id="nextStageBtn" class="stage-nav-btn">下一階段</button>
+                </div>
+            </div>
+
+            <div id="result-container" class="result-container hidden">
+                <div class="result-display">
+                    <h2>你的專屬食物人格是：</h2>
+                    <h2 id="final-food-personality"></h2>
+                    <p id="food-personality-description"></p>
+
+                    <h3>😋 適合與你搭配的食物們：</h3>
+                    <ul id="suitable-foods-with-reason"></ul>
+
+                    <h3>🤔 需要更多理解的食物們：</h3>
+                    <ul id="unsuitable-foods-with-reason"></ul>
+                </div>
+
+                <div id="feedback-section">
+                    <h3>你覺得這個結果準確嗎？</h3>
+                    <div class="feedback-buttons">
+                        <button data-feedback="accurate">準確</button>
+                        <button data-feedback="inaccurate">不準確</button>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons" style="flex-direction: column; align-items: center;">
+                    <button id="saveResultImageBtn" class="stage-nav-btn" style="background: linear-gradient(45deg, #00C853, #69F0AE);">儲存結果圖片</button>
+                    <button id="restartQuizBtn" class="stage-nav-btn" style="background: linear-gradient(45deg, #FFAB40, #FFD180);">重新測驗</button>
+                </div>
+            </div>
+
+            <div id="disclaimer-text" class="disclaimer-text">
+                <p id="disclaimer-content"></p>
             </div>
         </div>
     </div>
 
     <script>
-        const userNameInput = document.getElementById('userName');
-        const startQuizBtn = document.getElementById('startQuizBtn');
+        // DOM Elements
         const introContainer = document.getElementById('intro-container');
         const quizContainer = document.getElementById('quiz-container');
         const resultContainer = document.getElementById('result-container');
-        const currentStageContent = document.getElementById('current-stage-content');
-        const prevStageBtn = document.getElementById('prevStageBtn');
+        const startQuizBtn = document.getElementById('startQuizBtn');
         const nextStageBtn = document.getElementById('nextStageBtn');
-        const finalFoodPersonality = document.getElementById('final-food-personality');
-        const foodPersonalityDescription = document.getElementById('food-personality-description');
-        const suitableFoodsList = document.getElementById('suitable-foods-with-reason');
-        const unsuitableFoodsList = document.getElementById('unsuitable-foods-with-reason');
-        const saveResultImageBtn = document.getElementById('saveResultImage');
+        const prevStageBtn = document.getElementById('prevStageBtn');
         const restartQuizBtn = document.getElementById('restartQuizBtn');
-        const feedbackButtons = document.querySelector('.feedback-buttons');
-        const introDisclaimer = document.getElementById('introDisclaimer');
-        const resultDisclaimer = document.getElementById('resultDisclaimer');
+        const saveResultImageBtn = document.getElementById('saveResultImageBtn');
+        const disclaimerText = document.getElementById('disclaimer-text');
+        const disclaimerContent = document.getElementById('disclaimer-content');
+        const userNameInput = document.getElementById('userNameInput');
+        const currentStageContent = document.getElementById('currentStageContent');
 
+        // Global Variables
         let userName = '';
-        let currentStage = 0;
-        let userAnswers = {}; // Store answers for each question within a stage
-        let totalScores = {
-            'E': 0, 'I': 0, // Extroversion/Introversion
-            'S': 0, 'N': 0, // Sensing/Intuition
-            'T': 0, 'F': 0, // Thinking/Feeling
-            'J': 0, 'P': 0, // Judging/Perceiving
-            'Type1': 0, 'Type2': 0, 'Type3': 0, 'Type4': 0, 'Type5': 0, 'Type6': 0, 'Type7': 0, 'Type8': 0, 'Type9': 0 // Enneagram Types
-        };
+        let currentStageIndex = 0;
+        let userAnswers = {}; // Stores { globalQuestionIndex: selectedOptionIndex }
+        let mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        let enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
 
-        const quizStages = [
-            // Stage 0: Personality Test (MBTI-like)
+        // Disclaimer Content
+        const introDisclaimerHTML = `
+            <strong>免責聲明：</strong> 本測驗僅為趣味娛樂性質，結果不具備任何專業心理學或科學依據。測驗結果旨在提供自我探索的視角，不應作為任何嚴肅決策的參考。
+            <br><br>
+            您的隱私受到尊重。您的名字將僅用於測驗結果顯示，不會被儲存或分享。您的測驗答案將用於計算食物人格，且測驗結束後即刻清除，不會被記錄。
+            <br><br>
+            如果您對MBTI或九型人格有更深入的興趣，建議尋求專業的心理諮詢或相關資源。
+        `;
+
+        const resultDisclaimerHTML = `
+            <strong>免責聲明：</strong> 本測驗僅為趣味娛樂性質，結果不具備任何專業心理學或科學依據。測驗結果旨在提供自我探索的視角，不應作為任何嚴肅決策的參考。
+            <br><br>
+            您的隱私受到尊重。您的名字將僅用於測驗結果顯示，不會被儲存或分享。您的測驗答案將用於計算食物人格，且測驗結束後即刻清除，不會被記錄。
+            <br><br>
+            如果您對MBTI或九型人格有更深入的興趣，建議尋求專業的心理諮詢或相關資源。
+        `;
+
+
+        // Placeholder for quiz stages (replace with your actual question data)
+        const stages = [
             {
                 title: '✨ 階段一：初登場與自我適應 ✨',
                 intro: '歡迎來到食物生存大賽！你剛發現自己變成了一塊食物。這第一個階段將探索你在全新環境下的初始反應和如何適應這個奇妙的新身份。',
@@ -681,7 +366,6 @@
                     },
                 ]
             },
-            // Stage 1: Lifestyle & Preferences (Enneagram-like aspects)
             {
                 title: '🤝 階段二：團隊組建與初次挑戰 🤝',
                 intro: '在食物世界裡，合作是生存之道。你將與其他食物組成隊伍，共同面對料理任務。這個階段考驗你的領導、協作與應變能力。',
@@ -856,57 +540,23 @@
                             { text: "重新定義自己，開創新路", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
                             { text: "笑看結果，隨緣自在", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 9: 1 } } }
                         ]
-                    },
+                    }
                 ]
-              },
-            ];
-        // Define food personalities (replace with your actual data)
-        const foodPersonalities = {
-            popcorn: { 
-                name: "爆米花", 
-                emoji: "🍿",
-                description: "你是充滿活力和社交魅力的爆米花！你熱愛自由，喜歡在人群中成為焦點，總能帶來歡樂和輕鬆的氛圍。你的適應力強，樂於接受新事物，生活對你來說就是一場場精彩的派對。"
-            },
-            blackCoffee: { 
-                name: "黑咖啡", 
-                emoji: "☕",
-                description: "你是深邃而獨立的黑咖啡。你注重深度和本質，喜歡獨自思考，追求知識和真理。你可能不善言辭，但內心豐富，一旦認定目標便會專注投入。你珍視清晰與效率，討厭冗餘與膚淺。"
-            },
-            tofuPudding: { 
-                name: "豆花", 
-                emoji: "🍮",
-                description: "你是溫潤如玉的豆花。你善良、溫和，富有同情心，總是樂於幫助他人。你追求和諧與內心的平靜，不喜歡衝突，是朋友圈中的潤滑劑。你細膩的情感讓你能夠敏銳地感知他人的需求。"
-            },
-            grilledCheeseSandwich: { 
-                name: "起司烤三明治", 
-                emoji: "🥪",
-                description: "你是溫暖而可靠的起司烤三明治。你務實、可靠，腳踏實地，是解決問題的高手。你重視傳統和穩定，喜歡將事情做得有條不紊。你對親近的人充滿忠誠，是值得信賴的依靠。"
-            },
-            macaron: { 
-                name: "馬卡龍", 
-                emoji: " macarons",
-                description: "你是色彩繽紛、充滿創意的馬卡龍。你擁有豐富的想像力和獨特的審美，不喜歡墨守成規。你追求個人表達，情感豐富且複雜，總能在平凡中發現不凡之美。你渴望被理解，也樂於探索新奇。"
-            },
-            cheeseFondue: { 
-                name: "起司火鍋", 
-                emoji: "🧀",
-                description: "你是充滿力量和掌控慾的起司火鍋。你自信、果斷，有強烈的領導慾和保護欲。你喜歡挑戰，不畏困難，願意為自己和在乎的人奮鬥。你直接且坦率，有時可能顯得強勢，但內心卻充滿熱情。"
-            },
-            roastedSweetPotato: { 
-                name: "烤地瓜", 
-                emoji: "🍠",
-                description: "你是樸實而忠誠的烤地瓜。你穩重、負責，重視安全感和歸屬感。你可能有些謹慎，但一旦信任便會全心投入。你勤懇踏實，是個可靠的盟友，總能在危難時刻給予支持。"
-            },
-            cottonCandy: { 
-                name: "棉花糖", 
-                emoji: "🍬",
-                description: "你是輕盈而夢幻的棉花糖。你追求內心的和諧與寧靜，喜歡簡單和舒適的生活。你傾向於避免衝突，擅長協調與包容。你可能有些隨性，但總是給人帶來輕鬆愉快的感覺。"
-            },
-            zucchini: { 
-                name: "櫛瓜", 
-                emoji: "🥒",
-                description: "你是清爽而內斂的櫛瓜。你喜歡保持獨立，不愛張揚，注重內在的成長和自我完善。你觀察力敏銳，善於分析，有著獨特的視角。你對新知充滿好奇，是個不斷學習的探究者。"
             }
+        ];
+
+
+        // Placeholder for food personalities data
+        const foodPersonalities = {
+            popcorn: { emoji: '🍿', name: '活潑爆米花', description: '你像爆米花一樣，充滿活力與驚喜，熱愛社交與自由，總能為周遭帶來歡樂氛圍！你的生活多采多姿，不怕嘗試新鮮事物，喜歡即興的樂趣和輕鬆的體驗。' },
+            blackCoffee: { emoji: '☕', name: '沉穩黑咖啡', description: '你像黑咖啡一樣，沉靜內斂、獨立思考，喜歡獨自探索知識的深度。你注重本質，不喜繁雜，追求純粹和真實，能帶給人清醒和深刻的感受。' },
+            tofuPudding: { emoji: '🍮', name: '溫柔豆花', description: '你像豆花一樣，溫和親切、善解人意，內心柔軟且富有同理心。你總是默默支持他人，給予溫暖與滋養，讓人感到舒適與安心。' },
+            grilledCheeseSandwich: { emoji: '🧀🥪', name: '經典烤起司三明治', description: '你像烤起司三明治一樣，務實可靠、腳踏實地，追求穩定與溫馨。你重視傳統和基礎，不喜歡不確定性，總能給人帶來熟悉的舒適感和飽足感。' },
+            macaron: { emoji: '🍬', name: '夢幻馬卡龍', description: '你像馬卡龍一樣，獨特而富有藝術氣息，充滿想像力與創造力。你追求美感和個人風格，不甘於平凡，總能帶來精緻且令人驚豔的體驗。' },
+            cheeseFondue: { emoji: '🧀🫕', name: '掌控起司火鍋', description: '你像起司火鍋一樣，熱情大膽、意志堅定，喜歡掌控全局並引導方向。你充滿力量，有著感染力的魅力，總能將周圍的人凝聚起來，共同享受豐盛。' },
+            roastedSweetPotato: { emoji: '🍠', name: '安心烤地瓜', description: '你像烤地瓜一樣，忠誠務實、追求安全感，是值得信賴的夥伴。你給人一種樸實而溫暖的感受，穩重而有韌性，總能提供堅實的支持和慰藉。' },
+            cottonCandy: { emoji: '☁️🍭', name: '和煦棉花糖', description: '你像棉花糖一樣，隨和、樂觀，不喜歡衝突，渴望內外世界的和諧。你個性溫柔，總是樂於包容，能輕易融化人際間的隔閡，帶來甜蜜的氛圍。' },
+            zucchini: { emoji: '🥒', name: '探究櫛瓜', description: '你像櫛瓜一樣，簡約而多變，不喜歡浮誇，喜歡探究事物的本質。你傾向於觀察和分析，追求實用性和內涵，能在平凡中發現不凡的價值。' },
         };
         const allFoodKeys = Object.keys(foodPersonalities);
 
@@ -915,7 +565,7 @@
         startQuizBtn.addEventListener('click', startQuiz);
         nextStageBtn.addEventListener('click', navigateStage);
         prevStageBtn.addEventListener('click', navigateStage);
-        restartQuizBtn.addEventListener('click', restartQuiz);
+        restartQuizBtn.addEventListener('click', restartQuiz); // This is the original restart button
         saveResultImageBtn.addEventListener('click', saveResultImage);
 
         // Initial setup on page load
@@ -985,6 +635,8 @@
                     // Store global question index and option index
                     button.dataset.questionGlobalIndex = questionGlobalIndex;
                     button.dataset.optionIndex = optionIndex;
+                    // Note: JSON.stringify/parse is robust but might be overkill if scores are simple numbers.
+                    // For more complex objects, it's necessary.
                     button.dataset.mbti = JSON.stringify(option.scores.mbti);
                     button.dataset.enneagram = JSON.stringify(option.scores.enneagram);
 
@@ -1083,6 +735,16 @@
             }
         }
 
+        // Helper function: Get global index of a question
+        function getQuestionGlobalIndex(stageIndex, questionIndexInStage) {
+            let globalIndex = 0;
+            for (let i = 0; i < stageIndex; i++) {
+                globalIndex += stages[i].questions.length;
+            }
+            globalIndex += questionIndexInStage;
+            return globalIndex;
+        }
+
         // Recalculate all scores based on user answers
         function recalculateScores() {
             // Reset all scores
@@ -1112,16 +774,6 @@
             });
         }
 
-        // Helper function: Get global index of a question
-        function getQuestionGlobalIndex(stageIndex, questionIndexInStage) {
-            let globalIndex = 0;
-            for (let i = 0; i < stageIndex; i++) {
-                globalIndex += stages[i].questions.length;
-            }
-            globalIndex += questionIndexInStage;
-            return globalIndex;
-        }
-
         // Calculate final MBTI type
         function calculateMBTI() {
             let mbtiType = "";
@@ -1134,7 +786,7 @@
 
         // Calculate final Enneagram type
         function calculateEnneagram() {
-            let maxScore = -1;
+            let maxScore = -1; // This variable is not actually used in the current logic but can be useful for debugging
             let finalEnneagramType = '未知';
 
             const enneagramEntries = Object.entries(enneagramScores);
@@ -1287,7 +939,7 @@
         // Restart Quiz
         function restartQuiz() {
             // Reload the page for a clean restart
-            location.reload(); 
+            location.reload();
         }
 
         // Helper function: Get N random unique elements from an array
@@ -1434,6 +1086,14 @@
                 
                 // Restore the disclaimer's display state only if it was hidden for screenshot
                 disclaimerText.style.display = originalDisclaimerDisplay;
+
+                // Re-show feedback section if it was hidden AND not already replaced by feedback message
+                const feedbackSection = document.getElementById('feedback-section'); // Re-get it as it might have been cleared
+                if (feedbackSection && feedbackSection.innerHTML.includes('<p style="font-size: 1.1em')) {
+                    // Do nothing, it's already showing a feedback message
+                } else if (feedbackSection) {
+                    feedbackSection.style.display = 'block'; // Or original display
+                }
             });
         }
 
@@ -1452,17 +1112,17 @@
                 foodPersonality: foodPersonality,
                 mbtiType: mbtiType,
                 enneagramType: enneagramType,
-                feedback: feedbackType 
+                feedback: feedbackType
             };
 
-            const backendApiUrl = 'https://food-quiz-python-backend.onrender.com/api/feedback'; 
+            const backendApiUrl = 'https://food-quiz-python-backend.onrender.com/api/feedback'; // Your backend API endpoint
 
             fetch(backendApiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(dataToSend), 
+                body: JSON.stringify(dataToSend),
             })
             .then(response => {
                 if (!response.ok) {
