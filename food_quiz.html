@@ -39,10 +39,14 @@
         }
 
         /* 歡迎頁面標題和標語 */
-        .quiz-section h1 {
+        .quiz-section h1,
+        .quiz-section h2 { /* 針對所有 h1, h2 標題 */
             color: #4a4a4a;
             font-size: 2.2em;
             margin-bottom: 10px;
+            text-align: center; /* 置中 */
+            word-break: break-word; /* 允許長單詞換行 */
+            overflow-wrap: break-word; /* 允許長單詞換行 */
         }
         .quiz-section .tagline {
             font-size: 1.1em;
@@ -387,7 +391,6 @@
             font-size: 0.9em;
             color: #777;
             margin-top: 10px;
-            display: none; /* 預設隱藏，只在手機顯示 */
         }
 
         /* 結果頁的免責聲明 */
@@ -398,6 +401,59 @@
             text-align: center;
         }
 
+        /* 更多詳情頁面樣式 */
+        #more-details-container {
+            background-color: #fdfdfd;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #more-details-container h2 {
+            color: #3b4252;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #more-details-container p {
+            font-size: 1.1em;
+            color: #4c566a;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        #more-details-container .copy-link-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* 確保在小螢幕上換行 */
+        }
+        #more-details-container .copy-link-group input {
+            flex-grow: 1;
+            max-width: 300px;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            text-align: center;
+            background-color: #eceff4;
+            color: #4c566a;
+        }
+        #more-details-container .copy-link-group button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            background-color: #88c0d0;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #more-details-container .copy-link-group button:hover {
+            background-color: #639db5;
+        }
+
+
         /* 手機適配 */
         @media (max-width: 768px) {
             body {
@@ -407,8 +463,9 @@
                 padding: 20px 15px;
                 border-radius: 10px;
             }
-            .quiz-section h1 {
-                font-size: 1.8em;
+            .quiz-section h1,
+            .quiz-section h2 {
+                font-size: 1.8em; /* 手機上標題字體縮小 */
             }
             .quiz-section .tagline, .food-description {
                 font-size: 1em;
@@ -431,23 +488,29 @@
             .feedback-buttons button {
                 width: 100%; /* 手機上按鈕佔滿寬度 */
             }
-            /* 手機上隱藏下載按鈕，顯示長按提示 */
+            /* 手機上下載按鈕和長按提示都顯示 */
             #downloadImageBtn {
-                display: none;
+                display: inline-block; /* 確保按鈕顯示 */
             }
             #saveImageHintText {
-                display: block;
+                display: block; /* 確保提示顯示 */
+            }
+            #more-details-container .copy-link-group {
+                flex-direction: column;
+            }
+            #more-details-container .copy-link-group input {
+                max-width: 100%;
             }
         }
 
         /* 電腦適配 */
         @media (min-width: 769px) {
-            /* 電腦上顯示下載按鈕，隱藏長按提示 */
+            /* 電腦上顯示下載按鈕，長按提示也顯示 (如果需要) */
             #downloadImageBtn {
                 display: inline-block; /* 確保按鈕顯示 */
             }
             #saveImageHintText {
-                display: none;
+                display: block; /* 確保提示顯示 */
             }
         }
         /* CSS 樣式結束 */
@@ -457,9 +520,9 @@
     <div class="container">
         <div id="intro-container" class="quiz-section">
             <h1>歡迎來到「食物人格」測驗！</h1>
-            <p class="tagline">找出你是哪種類型的食物，探索你的獨特個性！</p>
+            <p class="tagline">找出你是哪種風味的食物，探索你的獨特個性！</p>
             <div class="user-name-input-group">
-                <label for="userName">請輸入你的**獨特簽名**：</label>
+                <label for="userName">請輸入你的**個性名稱**：</label>
                 <input type="text" id="userName" placeholder="例如：料理小當家、食神" class="input-field">
             </div>
             <button id="startQuizBtn" class="primary-btn">開始測驗</button>
@@ -469,7 +532,8 @@
         </div>
 
         <div id="quiz-container" class="quiz-section hidden">
-            <div id="stage-progress" class="progress-indicator"></div> <div id="current-stage-content">
+            <div id="stage-progress" class="progress-indicator"></div>
+            <div id="current-stage-content">
                 </div>
             <div class="navigation-btns">
                 <button id="prevStageBtn" class="nav-btn hidden" data-direction="prev">上一階段</button>
@@ -480,19 +544,19 @@
         <div id="result-container" class="quiz-section hidden">
             <div id="screenshot-area" class="result-display-area">
                 <h2 class="result-title">
-                    <span id="userNameDisplay" class="username-highlight"></span>，你的食物人格是：
+                    <span id="userNameDisplay" class="username-highlight"></span>，你的風味人格是：
                 </h2>
                 <p id="final-food-personality" class="food-personality-name"></p>
                 <p id="food-personality-description" class="food-description"></p>
 
                 <div class="compatibility-section">
-                    <h3>和你最合拍的食物：</h3>
+                    <h3>和你最合拍的風味：</h3>
                     <ul id="suitable-foods-with-reason" class="food-list">
                         </ul>
                 </div>
 
                 <div class="compatibility-section">
-                    <h3>你可能需要多點理解的食物：</h3>
+                    <h3>你可能需要多點理解的風味：</h3>
                     <ul id="unsuitable-foods-with-reason" class="food-list">
                         </ul>
                 </div>
@@ -505,11 +569,11 @@
 
             <div id="image-display-area">
                 <img id="resultImagePreview" src="" alt="我的食物人格測驗結果">
-                <p id="saveImageHintText" class="hidden">可長按上方圖片即可儲存結果</p>
+                <p id="saveImageHintText">手機用戶：長按上方圖片即可儲存結果</p>
             </div>
 
-            <div class="feedback-section">
-                <h3>測驗結果是否準確？你的回饋很重要！</h3>
+            <div id="feedback-section" class="feedback-section">
+                <h3>測驗結果是否準確？回饋結束後能看更多分析喔！</h3>
                 <div class="feedback-buttons">
                     <button data-feedback="accurate">很準！👍</button>
                     <button data-feedback="somewhat">有點準 🤔</button>
@@ -519,8 +583,21 @@
 
             <div class="result-actions">
                 <a id="downloadImageBtn" class="secondary-btn" href="#" download="我的食物人格測驗結果.png">下載圖片</a>
+                <button id="viewMoreDetailsBtn" class="primary-btn hidden">查看更多詳情</button>
                 <button id="restartQuizBtn" class="secondary-btn">重新測驗</button>
             </div>
+        </div>
+
+        <div id="more-details-container" class="quiz-section hidden">
+            <h2>恭喜你被整</h2>
+            <p>
+                這是一份完全隨機的心理測驗<br>分享給朋友吧 讓他也體驗一下吧！
+            </p>
+            <div class="copy-link-group">
+                <input type="text" id="shareLink" value="https://reurl.cc/W0g405" readonly>
+                <button id="copyLinkBtn">複製連結</button>
+            </div>
+            <button id="restartQuizBtnFromDetails" class="secondary-btn">重新測驗</button>
         </div>
     </div>
 
@@ -541,11 +618,19 @@
         const suitableFoodsList = document.getElementById('suitable-foods-with-reason');
         const unsuitableFoodsList = document.getElementById('unsuitable-foods-with-reason');
         const restartQuizBtn = document.getElementById('restartQuizBtn');
-        const feedbackButtons = document.querySelectorAll('.feedback-buttons button');
+        const feedbackSection = document.getElementById('feedback-section'); // 直接引用回饋區塊
+        const feedbackButtons = document.querySelectorAll('#feedback-section .feedback-buttons button');
         const saveImageHintText = document.getElementById('saveImageHintText');
         const resultImagePreview = document.getElementById('resultImagePreview');
         const downloadImageBtn = document.getElementById('downloadImageBtn');
-        const screenshotArea = document.getElementById('screenshot-area'); // 新增對截圖區域的引用
+        const screenshotArea = document.getElementById('screenshot-area');
+
+        const viewMoreDetailsBtn = document.getElementById('viewMoreDetailsBtn'); // 新增查看更多詳情按鈕
+        const moreDetailsContainer = document.getElementById('more-details-container'); // 新增更多詳情頁面容器
+        const shareLinkInput = document.getElementById('shareLink'); // 分享連結輸入框
+        const copyLinkBtn = document.getElementById('copyLinkBtn'); // 複製連結按鈕
+        const restartQuizBtnFromDetails = document.getElementById('restartQuizBtnFromDetails'); // 更多詳情頁的重新測驗按鈕
+
 
         let currentStageIndex = 0;
         let userName = '';
@@ -553,11 +638,10 @@
         let mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
         let enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
 
-        // 測驗數據 (MBTI 和九型人格相關問題) - **此處維持原始題目內容**
+        // 測驗數據 (MBTI 和九型人格相關問題)
         const stages = [
-            // Stage 1-3 (MBTI 內向/外向)
             {
-                intro: "✨ **階段一：初登場與自我適應** ✨<br>歡迎來到食物生存大賽！你剛發現自己變成了一塊食物。這第一個階段將探索你在全新環境下的初始反應和如何適應這個奇妙的新身份。",
+                intro: "✨ **階段一：初登場與自我適應** ✨<br>探索你在新環境下的初始反應。",
                 questions: [
                     {
                         question: "1. 一覺醒來，你發現自己變成了一塊食物，你的第一反應？",
@@ -590,7 +674,7 @@
                 ]
             },
             {
-                intro: "🤝 **階段二：團隊組建與初次挑戰** 🤝<br>在食物世界裡，合作是生存之道。你將與其他食物組成隊伍，共同面對料理任務。這個階段考驗你的領導、協作與應變能力。",
+                intro: "🤝 **階段二：團隊組建與初次挑戰** 🤝<br>考驗你的領導、協作與應變能力。",
                 questions: [
                     {
                         question: "4. 面對即將到來的團隊挑戰，你會選擇在隊伍中扮演什麼角色？",
@@ -640,7 +724,7 @@
                 ]
             },
             {
-                intro: "🧠 **階段三：賽中突發狀況與人際處理** 🧠<br>比賽中總是充滿變數，人際關係也複雜多變。你將面對突發狀況和人際考驗，你的反應和處理方式將決定你的食物人格走向。",
+                intro: "🧠 **階段三：風暴來襲** 🧠<br>你的反應和處理方式將決定你的食物人格走向。",
                 questions: [
                     {
                         question: "9. 比賽期間，你發現有敵隊的食物作弊，但他們成績斐然，你會？",
@@ -688,7 +772,7 @@
                         ]
                     },
                     {
-                        question: "14. 你發現你暗戀的「米其林主廚」是敵隊的關鍵人物…你會？",
+                        question: "14. 你發現你暗戀的「米其林主廚」是敵隊的關鍵人物…？",
                         options: [
                             { text: "想辦法和他私下聯絡", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 2: 1 } } },
                             { text: "隱藏情感，專注比賽", scores: { mbti: { I: 2, S: 1, T: 1, J: 1 }, enneagram: { 1: 2, 5: 1 } } },
@@ -699,7 +783,7 @@
                 ]
             },
             {
-                intro: "🔥 **階段四：壓力與自省** 🔥<br>比賽進入白熱化階段，壓力和挑戰接踵而來。這個階段將深入你的內心，探索你如何在壓力下自我反思，以及你最珍視的價值。",
+                intro: "🔥 **階段四：壓力與自省** 🔥<br>探索你如何在壓力下自我反思，以及你最珍視的價值。",
                 questions: [
                     {
                         question: "15. 比賽進入最終衝刺，你突然遇到一個預料之外的「食材變質」危機，你的反應是？",
@@ -739,7 +823,7 @@
                 ]
             },
             {
-                intro: "🏆 **階段五：決賽與最終定論** 🏆<br>恭喜你來到最後一個階段！所有的努力都將在這一刻得到定義。你的選擇將引導你揭示你的終極食物人格，並展望你的風味未來。",
+                intro: "🏆 **階段五：決賽與最終定論** 🏆<br>你的選擇將引導你揭示你的終極食物人格。",
                 questions: [
                     {
                         question: "19. 經過這場風味大戰的洗禮，如果可以選擇「風味重生」，你會選擇成為怎樣的食物？",
@@ -754,7 +838,7 @@
                         question: "20. 最終評審對你進行了定義，宣布你屬於某種「食物人格」。你的反應是？",
                         options: [
                             { text: "接受這個定義，努力做好自己", scores: { mbti: { I: 1, S: 2, F: 1, J: 1 }, enneagram: { 9: 2, 6: 1 } } },
-                            { text: "挑戰評審，證明自己不同", scores: { mbti: { E: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
+                            { text: "挑戰評審，證明自己不同", scores: { mbti: { I: 1, N: 1, T: 2, J: 1 }, enneagram: { 8: 2, 1: 1 } } },
                             { text: "重新定義自己，開創新路", scores: { mbti: { I: 1, N: 2, F: 1, P: 1 }, enneagram: { 4: 2, 7: 1 } } },
                             { text: "笑看結果，隨緣自在", scores: { mbti: { E: 1, N: 2, F: 1, P: 1 }, enneagram: { 7: 2, 9: 1 } } }
                         ]
@@ -950,13 +1034,12 @@
 
         // 導航到下一階段或上一階段
         function navigateStage(direction) {
-            // 修正：當 data-direction 為 'result' 時，應觸發結果顯示
             if (direction === 'next') {
                 if (currentStageIndex < stages.length - 1) {
                     currentStageIndex++;
                     renderStage();
                 }
-            } else if (direction === 'result') { // 新增此條件來處理 '查看結果'
+            } else if (direction === 'result') {
                 calculateAndShowResult();
             } else if (direction === 'prev') {
                 if (currentStageIndex > 0) {
@@ -978,11 +1061,11 @@
                     if (selectedOptionIndex !== undefined) {
                         const selectedOption = q.options[selectedOptionIndex];
                         // 累計 MBTI 分數
-                        for (const key in selectedOption.scores.mbti) { // 注意這裡使用 mbti (小寫)
+                        for (const key in selectedOption.scores.mbti) {
                             mbtiScores[key] += selectedOption.scores.mbti[key];
                         }
                         // 累計九型人格分數
-                        for (const key in selectedOption.scores.enneagram) { // 注意這裡使用 enneagram (小寫)
+                        for (const key in selectedOption.scores.enneagram) {
                             enneagramScores[key] += selectedOption.scores.enneagram[key];
                         }
                     }
@@ -1034,7 +1117,8 @@
             recalculateScores();
 
             quizContainer.classList.add('hidden');
-            introContainer.classList.add('hidden'); // 確保 intro 頁面也隱藏
+            introContainer.classList.add('hidden');
+            moreDetailsContainer.classList.add('hidden'); // 確保更多詳情頁隱藏
             resultContainer.classList.remove('hidden');
             window.scrollTo(0, 0);
 
@@ -1045,7 +1129,7 @@
             console.log("MBTI 原始分數: ", mbtiScores);
             console.log("九型人格原始分數: ", enneagramScores);
 
-            // **核心修改：食物人格完全隨機選擇**
+            // 核心修改：食物人格完全隨機選擇
             const allFoodKeys = Object.keys(foodPersonalities);
             const finalFoodPersonalityKey = allFoodKeys[Math.floor(Math.random() * allFoodKeys.length)];
             const matchedFood = foodPersonalities[finalFoodPersonalityKey];
@@ -1054,7 +1138,7 @@
             foodPersonalityDescriptionElement.innerText = matchedFood.description;
 
             // 顯示用戶姓名
-            document.getElementById('userNameDisplay').innerText = userName || '你'; // 如果沒輸入姓名，顯示「你」
+            document.getElementById('userNameDisplay').innerText = userName || '你';
 
             // 隨機生成適合和不適合的食物
             const numSuitable = Math.floor(Math.random() * 2) + 2; // 2或3個
@@ -1062,7 +1146,6 @@
 
             const suitableFoodKeys = getRandomUniqueElements(allFoodKeys, numSuitable, [finalFoodPersonalityKey]);
             const unsuitableFoodKeys = getRandomUniqueElements(allFoodKeys, numUnsuitable, [finalFoodPersonalityKey, ...suitableFoodKeys]);
-
 
             // 顯示適合的食物
             suitableFoodsList.innerHTML = '';
@@ -1098,16 +1181,11 @@
 
         // 生成並顯示結果圖片
         function generateAndDisplayResultImage(matchedFood, mbti, enneagram) {
-            const resultImagePreview = document.getElementById('resultImagePreview');
-            const saveImageHintText = document.getElementById('saveImageHintText');
-            const downloadImageBtn = document.getElementById('downloadImageBtn');
-            const feedbackSection = document.querySelector('.feedback-section');
-            const resultActions = document.querySelector('.result-actions');
-
-            // 在截圖前，確保回饋區塊和下載按鈕是隱藏的，避免截圖到
+            // 在截圖前，確保回饋區塊、下載按鈕、更多詳情按鈕是隱藏的，避免截圖到
             feedbackSection.classList.add('hidden');
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
             saveImageHintText.classList.add('hidden');
+            viewMoreDetailsBtn.classList.add('hidden'); // 隱藏更多詳情按鈕
 
             html2canvas(screenshotArea, {
                 useCORS: true,
@@ -1121,31 +1199,26 @@
                 // 截圖完成後，隱藏原始的文字結果區塊
                 screenshotArea.classList.add('hidden');
 
-                // 顯示結果操作區塊 (包含重新測驗按鈕)
-                resultActions.style.display = 'flex'; // 確保顯示
+                // 顯示圖片預覽區塊
+                document.getElementById('image-display-area').classList.remove('hidden');
 
-                // 根據螢幕寬度決定顯示哪個提示/按鈕
-                const isMobile = window.innerWidth <= 768;
-
-                if (isMobile) {
-                    saveImageHintText.classList.remove('hidden'); // 顯示手機長按提示
-                } else {
-                    if (downloadImageBtn) {
-                        downloadImageBtn.classList.remove('hidden'); // 顯示電腦下載按鈕
-                        downloadImageBtn.href = dataURL;
-                        downloadImageBtn.download = `${userName || '我的食物人格'}_測驗結果.png`;
-                    }
-                }
-
-                // 最後顯示回饋區塊
+                // 顯示回饋區塊和操作按鈕
                 feedbackSection.classList.remove('hidden');
+                if (downloadImageBtn) {
+                    downloadImageBtn.classList.remove('hidden'); // 顯示下載按鈕
+                    downloadImageBtn.href = dataURL;
+                    downloadImageBtn.download = `${userName || '我的食物人格'}_測驗結果.png`;
+                }
+                saveImageHintText.classList.remove('hidden'); // 顯示手機長按提示
 
             }).catch(error => {
                 console.error("圖片生成失敗：", error);
                 alert("圖片生成失敗，請重試。");
                 // 即使失敗也要確保操作區塊和回饋區塊可見
-                resultActions.style.display = 'flex';
                 feedbackSection.classList.remove('hidden');
+                if (downloadImageBtn) downloadImageBtn.classList.remove('hidden');
+                saveImageHintText.classList.remove('hidden');
+                screenshotArea.classList.remove('hidden'); // 失敗時不隱藏原始文字區塊
             });
         }
 
@@ -1168,12 +1241,27 @@
             navigateStage(event.target.dataset.direction);
         });
 
+        // 結果頁的重新測驗按鈕
         restartQuizBtn.addEventListener('click', () => {
+            resetQuiz();
+        });
+
+        // 更多詳情頁的重新測驗按鈕
+        restartQuizBtnFromDetails.addEventListener('click', () => {
+            resetQuiz();
+        });
+
+        // 重置測驗狀態的函數
+        function resetQuiz() {
             resultContainer.classList.add('hidden');
+            moreDetailsContainer.classList.add('hidden'); // 確保更多詳情頁隱藏
             introContainer.classList.remove('hidden');
             userNameInput.value = ''; // 清空姓名
+            currentStageIndex = 0; // 重置階段索引
+            userAnswers = {}; // 清空答案
             mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
             enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+
             // 重置回饋按鈕狀態
             feedbackButtons.forEach(btn => {
                 btn.classList.remove('active');
@@ -1183,16 +1271,22 @@
             resultImagePreview.src = ''; // 清空圖片源
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
             saveImageHintText.classList.add('hidden');
-            document.querySelector('.feedback-section').classList.remove('hidden'); // 確保回饋區塊在重新測驗時可見
+            
+            // 確保回饋區塊和查看更多按鈕在重新測驗時是初始狀態
+            feedbackSection.classList.remove('hidden'); // 顯示回饋區塊
+            viewMoreDetailsBtn.classList.add('hidden'); // 隱藏查看更多按鈕
             screenshotArea.classList.remove('hidden'); // 重新測驗時顯示截圖區域，以便下次生成圖片
-        });
+            document.getElementById('image-display-area').classList.add('hidden'); // 隱藏圖片顯示區塊
+        }
+
 
         feedbackButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                // 視覺回饋：立即隱藏回饋區塊
+                // 視覺回饋：立即隱藏回饋區塊，顯示更多詳情按鈕
                 feedbackButtons.forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
-                document.querySelector('.feedback-section').classList.add('hidden'); // 立即隱藏回饋區塊
+                feedbackSection.classList.add('hidden'); // 立即隱藏回饋區塊
+                viewMoreDetailsBtn.classList.remove('hidden'); // 顯示查看更多按鈕
 
                 const feedbackType = event.target.dataset.feedback;
                 const finalMBTI = calculateMBTI(); // 再次計算以確保數據最新
@@ -1226,7 +1320,7 @@
                 })
                 .then(data => {
                     console.log('回饋成功:', data);
-                    alert('感謝您的回饋！');
+                    // alert('感謝您的回饋！'); // 移除彈窗，因為現在有更多詳情按鈕
                 })
                 .catch((error) => {
                     console.error('回饋發送錯誤:', error);
@@ -1235,15 +1329,44 @@
             });
         });
 
+        // 查看更多詳情按鈕事件
+        viewMoreDetailsBtn.addEventListener('click', () => {
+            resultContainer.classList.add('hidden');
+            moreDetailsContainer.classList.remove('hidden');
+            window.scrollTo(0, 0); // 滾動到頁面頂部
+        });
+
+        // 複製連結按鈕事件
+        copyLinkBtn.addEventListener('click', () => {
+            shareLinkInput.select(); // 選中文字
+            shareLinkInput.setSelectionRange(0, 99999); // 針對行動裝置
+
+            // 使用 document.execCommand('copy') 進行複製
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? '連結已複製！' : '複製失敗，請手動複製。';
+                alert(msg);
+            } catch (err) {
+                console.error('複製失敗:', err);
+                alert('複製失敗，請手動複製。');
+            }
+        });
+
+
         // 初始化：確保頁面加載時顯示歡迎頁面
         document.addEventListener('DOMContentLoaded', () => {
             introContainer.classList.remove('hidden');
             quizContainer.classList.add('hidden');
             resultContainer.classList.add('hidden');
+            moreDetailsContainer.classList.add('hidden'); // 確保更多詳情頁預設隱藏
+
             // 確保初始狀態下下載按鈕和手機提示是隱藏的
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
             saveImageHintText.classList.add('hidden');
             screenshotArea.classList.remove('hidden'); // 確保初始時截圖區域是可見的
+            document.getElementById('image-display-area').classList.add('hidden'); // 隱藏圖片顯示區塊
+            feedbackSection.classList.remove('hidden'); // 確保回饋區塊可見
+            viewMoreDetailsBtn.classList.add('hidden'); // 確保查看更多按鈕隱藏
         });
 
         // JavaScript 代碼結束
