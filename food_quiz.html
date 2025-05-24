@@ -270,8 +270,17 @@
             margin-bottom: 30px;
         }
 
-        .compatibility-section {
+        /* 新增的兼容性食物網格容器 */
+        .compatibility-sections-wrapper {
+            display: flex; /* 使用 flexbox 讓兩個區塊並排 */
+            flex-wrap: wrap; /* 允許在小螢幕上換行 */
+            gap: 20px; /* 兩個區塊之間的間距 */
             margin-top: 25px;
+        }
+
+        .compatibility-section {
+            flex: 1; /* 讓每個區塊平均分配空間 */
+            min-width: 300px; /* 每個區塊的最小寬度，小於此寬度會換行 */
             text-align: left;
             background-color: #eff3f7; /* 輕微背景色 */
             padding: 15px;
@@ -285,36 +294,46 @@
             margin-bottom: 15px;
             border-bottom: 2px solid #d8dee9;
             padding-bottom: 5px;
+            text-align: center; /* 兼容性區塊標題置中 */
         }
 
-        .food-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* 響應式網格：最小寬度 140px，自動適應列數 */
+            gap: 15px; /* 食物卡片之間的間距 */
+            margin-top: 15px;
         }
 
-        .food-list li {
+        .food-card {
             background-color: #f5f5f5;
-            padding: 12px 15px;
-            margin-bottom: 8px;
+            padding: 12px;
             border-radius: 6px;
             color: #4c566a;
             line-height: 1.5;
             box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            text-align: center; /* 卡片內容置中 */
+            display: flex; /* 使用 flexbox 垂直排版卡片內容 */
+            flex-direction: column;
+            align-items: center; /* 水平置中卡片內容 */
+            justify-content: center; /* 垂直置中卡片內容 */
         }
 
-        .food-list li:last-child {
-            margin-bottom: 0;
-        }
-
-        .food-list strong {
+        .food-card strong {
             color: #bf616a; /* 強調食物名稱顏色 */
+            font-size: 1.1em; /* 讓名稱稍微大一點 */
+            margin-bottom: 5px;
         }
-        .food-list .emoji {
-            margin-left: 5px;
-            font-size: 1.1em;
-            vertical-align: middle;
+
+        .food-card .emoji {
+            font-size: 2.5em; /* 更大的 emoji */
+            margin-bottom: 5px;
         }
+
+        .food-card .reason-text {
+            font-size: 0.9em;
+            color: #555;
+        }
+
 
         .feedback-section {
             margin-top: 30px;
@@ -495,6 +514,19 @@
             #saveImageHintText {
                 display: block; /* 確保提示顯示 */
             }
+            /* 手機上兼容性區塊維持並排，但可能會換行 */
+            .compatibility-sections-wrapper {
+                flex-direction: row; /* 保持橫排 */
+                flex-wrap: wrap; /* 允許換行 */
+                justify-content: center; /* 如果換行，讓區塊置中 */
+            }
+            .compatibility-section {
+                min-width: 280px; /* 調整最小寬度，讓手機上也能盡量並排或優雅換行 */
+                flex: 1 1 auto; /* 允許縮小和擴大 */
+            }
+            .food-grid {
+                grid-template-columns: 1fr; /* 手機上單欄顯示食物卡片 */
+            }
             #more-details-container .copy-link-group {
                 flex-direction: column;
             }
@@ -511,6 +543,14 @@
             }
             #saveImageHintText {
                 display: block; /* 確保提示顯示 */
+            }
+            .compatibility-sections-wrapper {
+                flex-direction: row; /* 保持橫排 */
+                flex-wrap: wrap; /* 允許換行 */
+            }
+            .compatibility-section {
+                flex: 1; /* 讓每個區塊平均分配空間 */
+                min-width: 300px; /* 確保足夠寬度 */
             }
         }
         /* CSS 樣式結束 */
@@ -549,16 +589,16 @@
                 <p id="final-food-personality" class="food-personality-name"></p>
                 <p id="food-personality-description" class="food-description"></p>
 
-                <div class="compatibility-section">
-                    <h3>和你最合拍的風味：</h3>
-                    <ul id="suitable-foods-with-reason" class="food-list">
-                        </ul>
-                </div>
+                <div class="compatibility-sections-wrapper">
+                    <div class="compatibility-section">
+                        <h3>和你最合拍的食物：</h3> <div id="suitable-foods-grid" class="food-grid">
+                            </div>
+                    </div>
 
-                <div class="compatibility-section">
-                    <h3>你可能需要多點理解的風味：</h3>
-                    <ul id="unsuitable-foods-with-reason" class="food-list">
-                        </ul>
+                    <div class="compatibility-section">
+                        <h3>你可能需要多點理解的食物：</h3> <div id="unsuitable-foods-grid" class="food-grid">
+                            </div>
+                    </div>
                 </div>
 
                 <p class="disclaimer">
@@ -591,7 +631,7 @@
         <div id="more-details-container" class="quiz-section hidden">
             <h2>恭喜你被整</h2>
             <p>
-                這是一份完全隨機的心理測驗<br>分享給朋友吧 讓他也體驗一下吧！
+                這是一份完全隨機的心理測驗 趕緊分享給朋友吧 讓他也體驗一下吧！
             </p>
             <div class="copy-link-group">
                 <input type="text" id="shareLink" value="https://reurl.cc/W0g405" readonly>
@@ -615,21 +655,23 @@
         const nextStageBtn = document.getElementById('nextStageBtn');
         const finalFoodPersonalityElement = document.getElementById('final-food-personality');
         const foodPersonalityDescriptionElement = document.getElementById('food-personality-description');
-        const suitableFoodsList = document.getElementById('suitable-foods-with-reason');
-        const unsuitableFoodsList = document.getElementById('unsuitable-foods-with-reason');
+        // 兼容性食物網格的 DOM 引用
+        const suitableFoodsGrid = document.getElementById('suitable-foods-grid');
+        const unsuitableFoodsGrid = document.getElementById('unsuitable-foods-grid');
+
         const restartQuizBtn = document.getElementById('restartQuizBtn');
-        const feedbackSection = document.getElementById('feedback-section'); // 直接引用回饋區塊
+        const feedbackSection = document.getElementById('feedback-section');
         const feedbackButtons = document.querySelectorAll('#feedback-section .feedback-buttons button');
         const saveImageHintText = document.getElementById('saveImageHintText');
         const resultImagePreview = document.getElementById('resultImagePreview');
         const downloadImageBtn = document.getElementById('downloadImageBtn');
         const screenshotArea = document.getElementById('screenshot-area');
 
-        const viewMoreDetailsBtn = document.getElementById('viewMoreDetailsBtn'); // 新增查看更多詳情按鈕
-        const moreDetailsContainer = document.getElementById('more-details-container'); // 新增更多詳情頁面容器
-        const shareLinkInput = document.getElementById('shareLink'); // 分享連結輸入框
-        const copyLinkBtn = document.getElementById('copyLinkBtn'); // 複製連結按鈕
-        const restartQuizBtnFromDetails = document.getElementById('restartQuizBtnFromDetails'); // 更多詳情頁的重新測驗按鈕
+        const viewMoreDetailsBtn = document.getElementById('viewMoreDetailsBtn');
+        const moreDetailsContainer = document.getElementById('more-details-container');
+        const shareLinkInput = document.getElementById('shareLink');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const restartQuizBtnFromDetails = document.getElementById('restartQuizBtnFromDetails');
 
 
         let currentStageIndex = 0;
@@ -724,7 +766,7 @@
                 ]
             },
             {
-                intro: "🧠 **階段三：風暴來襲** 🧠<br>你的反應和處理方式將決定你的食物人格走向。",
+                intro: "🧠 **階段三：賽中突發狀況與人際處理** 🧠<br>你的反應和處理方式將決定你的食物人格走向。",
                 questions: [
                     {
                         question: "9. 比賽期間，你發現有敵隊的食物作弊，但他們成績斐然，你會？",
@@ -847,7 +889,7 @@
             }
         ];
 
-        // 食物人格定義 (已更新為你的新列表，移除了內部的 suitable/unsuitable 屬性)
+        // 食物人格定義
         const foodPersonalities = {
             macaron: {
                 name: '馬卡龍',
@@ -896,7 +938,7 @@
             }
         };
 
-        // 隨機理由列表 (保持不變)
+        // 隨機理由列表 (這些文字將不再顯示在卡片上，但保留在程式碼中以防未來需要)
         const suitableReasons = [
             "因為你們都喜歡在週末輕鬆聚會。",
             "你們總能理解彼此的幽默感。",
@@ -1147,32 +1189,46 @@
             const suitableFoodKeys = getRandomUniqueElements(allFoodKeys, numSuitable, [finalFoodPersonalityKey]);
             const unsuitableFoodKeys = getRandomUniqueElements(allFoodKeys, numUnsuitable, [finalFoodPersonalityKey, ...suitableFoodKeys]);
 
-            // 顯示適合的食物
-            suitableFoodsList.innerHTML = '';
+            // 清空並填充適合的食物網格
+            suitableFoodsGrid.innerHTML = '';
             if (suitableFoodKeys.length > 0) {
                 suitableFoodKeys.forEach(key => {
                     const food = foodPersonalities[key];
-                    const randomReason = suitableReasons[Math.floor(Math.random() * suitableReasons.length)];
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>${food.name}</strong> <span class="emoji">${food.emoji}</span>：${randomReason}`;
-                    suitableFoodsList.appendChild(listItem);
+                    // 移除了 randomReason 的顯示，只保留食物名稱和 emoji
+                    const foodCard = document.createElement('div');
+                    foodCard.className = 'food-card';
+                    foodCard.innerHTML = `
+                        <span class="emoji">${food.emoji}</span>
+                        <strong>${food.name}</strong>
+                    `;
+                    suitableFoodsGrid.appendChild(foodCard);
                 });
             } else {
-                suitableFoodsList.innerHTML = '<li>目前沒有特別合拍的食物。</li>';
+                const noFoodMessage = document.createElement('p');
+                noFoodMessage.className = 'reason-text';
+                noFoodMessage.innerText = '目前沒有特別合拍的食物。';
+                suitableFoodsGrid.appendChild(noFoodMessage);
             }
 
-            // 顯示不適合的食物
-            unsuitableFoodsList.innerHTML = '';
+            // 清空並填充不適合的食物網格
+            unsuitableFoodsGrid.innerHTML = '';
             if (unsuitableFoodKeys.length > 0) {
                 unsuitableFoodKeys.forEach(key => {
                     const food = foodPersonalities[key];
-                    const randomReason = unsuitableReasons[Math.floor(Math.random() * unsuitableReasons.length)];
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>${food.name}</strong> <span class="emoji">${food.emoji}</span>：${randomReason}`;
-                    unsuitableFoodsList.appendChild(listItem);
+                    // 移除了 randomReason 的顯示，只保留食物名稱和 emoji
+                    const foodCard = document.createElement('div');
+                    foodCard.className = 'food-card';
+                    foodCard.innerHTML = `
+                        <span class="emoji">${food.emoji}</span>
+                        <strong>${food.name}</strong>
+                    `;
+                    unsuitableFoodsGrid.appendChild(foodCard);
                 });
             } else {
-                unsuitableFoodsList.innerHTML = '<li>目前沒有特別需要多點理解的食物。</li>';
+                const noFoodMessage = document.createElement('p');
+                noFoodMessage.className = 'reason-text';
+                noFoodMessage.innerText = '目前沒有特別需要多點理解的食物。';
+                unsuitableFoodsGrid.appendChild(noFoodMessage);
             }
 
             // 觸發圖片生成和顯示
