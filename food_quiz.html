@@ -601,12 +601,12 @@
 
                     <div class="compatibility-sections-wrapper">
                         <div class="compatibility-section">
-                            <h3>最合拍食物：</h3> <div id="suitable-foods-grid" class="food-grid">
+                            <h3>和你最合拍的食物：</h3> <div id="suitable-foods-grid" class="food-grid">
                                 </div>
                         </div>
 
                         <div class="compatibility-section">
-                            <h3>需理解食物：</h3> <div id="unsuitable-foods-grid" class="food-grid">
+                            <h3>你可能需要多點理解的食物：</h3> <div id="unsuitable-foods-grid" class="food-grid">
                                 </div>
                         </div>
                     </div>
@@ -707,7 +707,7 @@
                     }
                     ,
                     {
-                        question: "2. 在這個全新的食物世界，你需要向一群陌生食物自我介紹，你會？",
+                        question: "2. 在這個全新的食物世界，你需要向一群陌生食物自我介紹，會？",
                         options: [
                             { text: "熱情開場，還幫別人介紹", scores: { mbti: { E: 2, F: 1 }, enneagram: { 2: 2, 7: 1 } } },
                             { text: "簡短講完就想快閃", scores: { mbti: { I: 2, T: 1 }, enneagram: { 5: 2, 6: 1 } } },
@@ -924,7 +924,7 @@
             },
             popcorn: {
                 name: '爆米花',
-                emoji: '�',
+                emoji: '🍿',
                 description: '你像爆米花一樣，充滿了活力與驚喜。你熱愛自由，喜歡嘗試新事物，並且總能用你的熱情感染周遭的人。'
             },
             cottonCandy: {
@@ -1224,7 +1224,8 @@
             // 清空並填充不適合的食物網格
             unsuitableFoodsGrid.innerHTML = '';
             if (unsuitableFoodKeys.length > 0) {
-                unsuitableUnsuitableKeys.forEach(key => {
+                // 修正了這裡的變數名稱，從 unsuitableUnsuitableKeys 改為 unsuitableFoodKeys
+                unsuitableFoodKeys.forEach(key => { // 已修正
                     const food = foodPersonalities[key];
                     // 移除了 randomReason 的顯示，只保留食物名稱和 emoji
                     const foodCard = document.createElement('div');
