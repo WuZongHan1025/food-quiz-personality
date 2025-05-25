@@ -20,7 +20,6 @@
             box-sizing: border-box;
             line-height: 1.6;
         }
-
         .container {
             background-color: #fff;
             padding: 30px;
@@ -32,12 +31,10 @@
             position: relative;
             overflow: hidden;
         }
-
         /* 隱藏的區塊 */
         .hidden {
             display: none !important;
         }
-
         /* 歡迎頁面標題和標語 */
         .quiz-section h1,
         .quiz-section h2 { /* 針對所有 h1, h2 標題 */
@@ -53,7 +50,6 @@
             color: #666;
             margin-bottom: 30px;
         }
-
         /* 姓名輸入提示樣式 */
         .user-name-input-group {
             margin-bottom: 20px;
@@ -85,7 +81,6 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(136, 192, 208, 0.3);
         }
-
         /* 按鈕通用樣式 */
         button {
             padding: 12px 25px;
@@ -97,44 +92,37 @@
             outline: none;
             margin: 5px; /* 增加按鈕間距 */
         }
-
         .primary-btn {
             background-color: #88c0d0; /* 北歐藍 */
             color: white;
             box-shadow: 0 4px 6px rgba(136, 192, 208, 0.3);
         }
-
         .primary-btn:hover {
             background-color: #639db5;
             transform: translateY(-2px);
             box-shadow: 0 6px 10px rgba(136, 192, 208, 0.4);
         }
-
         .nav-btn {
             background-color: #a3be8c; /* 北歐綠 */
             color: white;
             box-shadow: 0 4px 6px rgba(163, 190, 140, 0.3);
         }
-
         .nav-btn:hover {
             background-color: #8fa779;
             transform: translateY(-2px);
             box-shadow: 0 6px 10px rgba(163, 190, 140, 0.4);
         }
-
         .secondary-btn {
             background-color: #eceff4; /* 北歐淺灰 */
             color: #4c566a;
             border: 1px solid #d8dee9;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .secondary-btn:hover {
             background-color: #d8dee9;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-
         /* 進度指示器 */
         .progress-indicator {
             text-align: center;
@@ -146,7 +134,6 @@
             border-radius: 8px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
-
         /* 按鈕禁用狀態 */
         .nav-btn.disabled {
             opacity: 0.6;
@@ -178,14 +165,12 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
         .option-btn.selected {
             background-color: #5e81ac; /* 北歐深藍 */
             color: white;
             border-color: #5e81ac;
             box-shadow: 0 4px 8px rgba(94, 129, 172, 0.3);
         }
-
         /* 問題區塊 */
         .question-block {
             background-color: #f8f8f8;
@@ -195,20 +180,17 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             text-align: left;
         }
-
         .question-text {
             font-size: 1.2em;
             color: #3b4252; /* 北歐深灰藍 */
             margin-bottom: 15px;
             font-weight: bold;
         }
-
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 8px; /* 增加選項間距 */
         }
-
         /* 階段引文 */
         .stage-intro {
             background-color: #e5e9f0; /* 北歐淺灰藍 */
@@ -220,7 +202,6 @@
             line-height: 1.6;
             box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
         }
-
         /* 導航按鈕容器 */
         .navigation-btns {
             display: flex;
@@ -228,27 +209,27 @@
             margin-top: 30px;
             padding: 0 10px;
         }
-
         /* 結果頁樣式 */
         .result-display-area { /* 新的截圖區域樣式 */
-            padding: 20px;
+            /* 移除 padding，讓其寬度直接成為圖片寬度 */
             background-color: #fdfdfd;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             margin-bottom: 20px; /* 與下方的回饋區隔開 */
         }
-
+        /* 新增的內部容器，用於內容的 padding */
+        .result-content-inner {
+            padding: 20px; /* 將 padding 應用到這裡 */
+        }
         .result-title {
             color: #3b4252;
             font-size: 2em;
             margin-bottom: 15px;
         }
-
         .username-highlight {
             color: #bf616a; /* 北歐紅 */
             font-weight: bold;
         }
-
         .food-personality-name {
             font-size: 2.8em;
             font-weight: bold;
@@ -256,42 +237,37 @@
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-
         .food-personality-name .emoji {
             font-size: 1.2em; /* 讓 emoji 稍微大一點 */
             vertical-align: middle;
             margin-right: 5px;
         }
-
         .food-description {
             font-size: 1.1em;
             color: #4c566a;
             line-height: 1.6;
             margin-bottom: 30px;
         }
-
         /* 新增的兼容性食物網格容器 */
         .compatibility-sections-wrapper {
             display: flex; /* 使用 flexbox 讓兩個區塊並排 */
             flex-wrap: wrap; /* 預設允許換行，以適應手機 */
-            gap: 0; /* 兩個區塊之間的間距設置為 0 */
+            gap: 10px; /* 兩個區塊之間的間距 */
             margin-top: 25px;
             overflow-x: hidden; /* 隱藏橫向滾動條 */
             padding-bottom: 10px; /* 防止滾動條遮擋內容 */
             justify-content: center; /* 讓區塊在換行時居中 */
         }
-
         .compatibility-section {
-            flex: 1 1 45%; /* 讓每個區塊平均分配空間，在小螢幕上可以佔滿一行，大螢幕上並排 */
+            flex: 1 1 calc(50% - 5px); /* 讓每個區塊平均分配空間，考慮 gap */
             min-width: 280px; /* 確保每個區塊的最小寬度，防止過窄 */
             text-align: left;
             background-color: #eff3f7; /* 輕微背景色 */
             padding: 15px;
             border-radius: 8px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-            margin: 5px; /* 增加區塊之間的微小間距，避免完全黏在一起 */
+            /* 移除 margin，由 gap 處理間距 */
         }
-
         .compatibility-section h3 {
             color: #5e81ac;
             font-size: 1.3em;
@@ -300,14 +276,12 @@
             padding-bottom: 5px;
             text-align: center; /* 兼容性區塊標題置中 */
         }
-
         .food-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* 響應式網格：最小寬度 100px，自動適應列數 */
             gap: 10px; /* 食物卡片之間的間距 */
             margin-top: 15px;
         }
-
         .food-card {
             background-color: #f5f5f5;
             padding: 8px 12px; /* 調整 padding 讓卡片更緊湊 */
@@ -323,21 +297,16 @@
             gap: 8px; /* 表情符號和文字之間的間距 */
             min-width: 100px; /* 確保卡片有最小寬度 */
         }
-
         .food-card strong {
             color: #bf616a; /* 強調食物名稱顏色 */
             font-size: 1.1em; /* 讓名稱稍微大一點 */
         }
-
         .food-card .emoji {
             font-size: 2em; /* 更大的 emoji */
         }
-
         .food-card .reason-text {
             display: none; /* 隱藏解釋文字 */
         }
-
-
         .feedback-section {
             margin-top: 30px;
             text-align: center;
@@ -346,20 +315,17 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-
         .feedback-section h3 {
             color: #3b4252;
             font-size: 1.3em;
             margin-bottom: 20px;
         }
-
         .feedback-buttons {
             display: flex;
             justify-content: center;
             flex-wrap: wrap; /* 換行顯示按鈕 */
             gap: 15px; /* 按鈕間距 */
         }
-
         .feedback-buttons button {
             background-color: #88c0d0;
             color: white;
@@ -384,20 +350,17 @@
             transform: none;
             box-shadow: none;
         }
-
         .result-actions {
             margin-top: 25px;
             display: flex;
             justify-content: center; /* 讓按鈕置中 */
             gap: 20px;
         }
-
         /* 圖片預覽和提示 */
         #image-display-area {
             text-align: center;
             margin-top: 20px;
         }
-
         #resultImagePreview {
             max-width: 100%;
             height: auto;
@@ -407,14 +370,12 @@
             display: block; /* 確保圖片獨佔一行並居中 */
             margin: 0 auto;
         }
-
         /* 手機提示文字 */
         #saveImageHintText {
             font-size: 0.9em;
             color: #777;
             margin-top: 10px;
         }
-
         /* 結果頁的免責聲明 */
         .disclaimer {
             margin-top: 30px; /* 增加與按鈕的距離 */
@@ -422,7 +383,6 @@
             color: #888;
             text-align: center;
         }
-
         /* 更多詳情頁面樣式 */
         #more-details-container {
             background-color: #fdfdfd;
@@ -474,8 +434,6 @@
         #more-details-container .copy-link-group button:hover {
             background-color: #639db5;
         }
-
-
         /* 手機適配 */
         @media (max-width: 768px) {
             body {
@@ -538,7 +496,6 @@
                 max-width: 100%;
             }
         }
-
         /* 電腦適配 */
         @media (min-width: 769px) {
             /* 電腦上顯示下載按鈕，長按提示也顯示 (如果需要) */
@@ -553,9 +510,9 @@
                 justify-content: center; /* 橫向居中 */
             }
             .compatibility-section {
-                flex: 1; /* 讓每個區塊平均分配空間 */
+                flex: 1 1 calc(50% - 5px); /* 讓每個區塊平均分配空間，考慮 gap */
                 min-width: 300px; /* 確保足夠寬度 */
-                margin: 5px; /* 橫向間距 */
+                /* 移除 margin，由 gap 處理間距 */
             }
         }
         /* CSS 樣式結束 */
@@ -575,7 +532,6 @@
                 免責聲明：本測驗結果僅供娛樂與自我探索，不應被視為專業心理分析。
             </p>
         </div>
-
         <div id="quiz-container" class="quiz-section hidden">
             <div id="stage-progress" class="progress-indicator"></div>
             <div id="current-stage-content">
@@ -585,38 +541,33 @@
                 <button id="nextStageBtn" class="nav-btn" data-direction="next">下一階段</button>
             </div>
         </div>
-
         <div id="result-container" class="quiz-section hidden">
             <div id="screenshot-area" class="result-display-area">
-                <h2 class="result-title">
-                    <span id="userNameDisplay" class="username-highlight"></span>，你的風味人格是：
-                </h2>
-                <p id="final-food-personality" class="food-personality-name"></p>
-                <p id="food-personality-description" class="food-description"></p>
-
-                <div class="compatibility-sections-wrapper">
-                    <div class="compatibility-section">
-                        <h3>最合拍食物：</h3> <div id="suitable-foods-grid" class="food-grid">
-                            </div>
+                <div class="result-content-inner"> <h2 class="result-title">
+                        <span id="userNameDisplay" class="username-highlight"></span>，你的風味人格是：
+                    </h2>
+                    <p id="final-food-personality" class="food-personality-name"></p>
+                    <p id="food-personality-description" class="food-description"></p>
+                    <div class="compatibility-sections-wrapper">
+                        <div class="compatibility-section">
+                            <h3>最合拍食物：</h3> <div id="suitable-foods-grid" class="food-grid">
+                                </div>
+                        </div>
+                        <div class="compatibility-section">
+                            <h3>需理解食物：</h3> <div id="unsuitable-foods-grid" class="food-grid">
+                                </div>
+                        </div>
                     </div>
-
-                    <div class="compatibility-section">
-                        <h3>需理解食物：</h3> <div id="unsuitable-foods-grid" class="food-grid">
-                            </div>
-                    </div>
+                    <p class="disclaimer">
+                        免責聲明：本測驗結果僅供娛樂與自我探索，不應被視為專業心理分析。
+                        <br>請勿將此結果作為任何正式評斷的依據。
+                    </p>
                 </div>
-
-                <p class="disclaimer">
-                    免責聲明：本測驗結果僅供娛樂與自我探索，不應被視為專業心理分析。
-                    <br>請勿將此結果作為任何正式評斷的依據。
-                </p>
             </div>
-
             <div id="image-display-area">
                 <img id="resultImagePreview" src="" alt="我的食物人格測驗結果">
                 <p id="saveImageHintText">手機用戶：長按上方圖片即可儲存結果</p>
             </div>
-
             <div id="feedback-section" class="feedback-section">
                 <h3>測驗結果是否準確？回饋結束後能看更多分析喔！</h3>
                 <div class="feedback-buttons">
@@ -625,14 +576,12 @@
                     <button data-feedback="inaccurate">不準 👎</button>
                 </div>
             </div>
-
             <div class="result-actions">
                 <a id="downloadImageBtn" class="secondary-btn" href="#" download="我的食物人格測驗結果.png">下載圖片</a>
                 <button id="viewMoreDetailsBtn" class="primary-btn hidden">查看更多詳情</button>
                 <button id="restartQuizBtn" class="secondary-btn">重新測驗</button>
             </div>
         </div>
-
         <div id="more-details-container" class="quiz-section hidden">
             <h2>恭喜你被整</h2>
             <p>
@@ -645,10 +594,8 @@
             <button id="restartQuizBtnFromDetails" class="secondary-btn">重新測驗</button>
         </div>
     </div>
-
     <script>
         // JavaScript 代碼開始
-
         // DOM 元素引用
         const introContainer = document.getElementById('intro-container');
         const quizContainer = document.getElementById('quiz-container');
@@ -663,7 +610,6 @@
         // 兼容性食物網格的 DOM 引用
         const suitableFoodsGrid = document.getElementById('suitable-foods-grid');
         const unsuitableFoodsGrid = document.getElementById('unsuitable-foods-grid');
-
         const restartQuizBtn = document.getElementById('restartQuizBtn');
         const feedbackSection = document.getElementById('feedback-section');
         const feedbackButtons = document.querySelectorAll('#feedback-section .feedback-buttons button');
@@ -671,20 +617,16 @@
         const resultImagePreview = document.getElementById('resultImagePreview');
         const downloadImageBtn = document.getElementById('downloadImageBtn');
         const screenshotArea = document.getElementById('screenshot-area');
-
         const viewMoreDetailsBtn = document.getElementById('viewMoreDetailsBtn');
         const moreDetailsContainer = document.getElementById('more-details-container');
         const shareLinkInput = document.getElementById('shareLink');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const restartQuizBtnFromDetails = document.getElementById('restartQuizBtnFromDetails');
-
-
         let currentStageIndex = 0;
         let userName = '';
         let userAnswers = {}; // {globalQuestionIndex: selectedOptionIndex}
         let mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
         let enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-
         // 測驗數據 (MBTI 和九型人格相關問題)
         const stages = [
             {
@@ -893,7 +835,6 @@
                 ]
             }
         ];
-
         // 食物人格定義
         const foodPersonalities = {
             macaron: {
@@ -918,7 +859,7 @@
             },
             popcorn: {
                 name: '爆米花',
-                emoji: '🍿',
+                emoji: '�',
                 description: '你像爆米花一樣，充滿了活力與驚喜。你熱愛自由，喜歡嘗試新事物，並且總能用你的熱情感染周遭的人。'
             },
             cottonCandy: {
@@ -942,7 +883,6 @@
                 description: '你像烤地瓜一樣，溫暖、踏實，給人一種安心的感覺。你內斂、真誠，並且擁有堅韌的生命力，總能默默地支持身邊的人。'
             }
         };
-
         // 隨機理由列表 (這些文字將不再顯示在卡片上，但保留在程式碼中以防未來需要)
         const suitableReasons = [
             "因為你們都喜歡在週末輕鬆聚會。",
@@ -951,7 +891,6 @@
             "你們對世界充滿好奇，喜歡一起探索新事物。",
             "你們在一起時，總能找到平靜和滿足。"
         ];
-
         const unsuitableReasons = [
             "他們的步調可能與你不太一致。",
             "你們對事物的看法可能存在較大差異。",
@@ -959,7 +898,6 @@
             "他們喜歡的活動或許不是你的菜。",
             "你們在面對壓力時，反應方式可能截然不同。"
         ];
-
         // 輔助函數：獲取問題在所有階段中的全局索引
         function getQuestionGlobalIndex(stageIndex, questionIndexInStage) {
             let globalIndex = 0;
@@ -968,16 +906,13 @@
             }
             return globalIndex + questionIndexInStage;
         }
-
         // 渲染當前階段的問題
         function renderStage() {
             const currentStage = stages[currentStageIndex];
             currentStageContent.innerHTML = '';
-
             // 更新進度指示器
             const progressIndicator = document.getElementById('stage-progress');
             progressIndicator.innerText = `階段 ${currentStageIndex + 1} / ${stages.length}`; // 顯示階段進度
-
             // 添加階段引文
             if (currentStage.intro) {
                 const introDiv = document.createElement('div');
@@ -985,7 +920,6 @@
                 introDiv.innerHTML = `<p>${currentStage.intro}</p>`;
                 currentStageContent.appendChild(introDiv);
             }
-
             // 渲染問題
             currentStage.questions.forEach((q, qIndex) => {
                 const questionBlock = document.createElement('div');
@@ -994,22 +928,18 @@
                 questionText.className = 'question-text';
                 questionText.innerText = q.question;
                 questionBlock.appendChild(questionText);
-
                 const optionsContainer = document.createElement('div');
                 optionsContainer.className = 'options-container';
-
                 q.options.forEach((option, optionIndex) => {
                     const optionBtn = document.createElement('button');
                     optionBtn.className = 'option-btn';
                     optionBtn.innerText = option.text;
                     optionBtn.dataset.questionIndexInStage = qIndex;
                     optionBtn.dataset.optionIndex = optionIndex;
-
                     const globalQuestionIndex = getQuestionGlobalIndex(currentStageIndex, qIndex);
                     if (userAnswers[globalQuestionIndex] === optionIndex) {
                         optionBtn.classList.add('selected');
                     }
-
                     optionBtn.addEventListener('click', selectOption);
                     optionsContainer.appendChild(optionBtn);
                 });
@@ -1020,18 +950,15 @@
             updateNavigationButtons();
             window.scrollTo(0, 0); // 滾動到頁面頂部
         }
-
         // 處理選項選擇
         function selectOption(event) {
             const selectedBtn = event.target;
             const questionIndexInStage = parseInt(selectedBtn.dataset.questionIndexInStage);
             const optionIndex = parseInt(selectedBtn.dataset.optionIndex);
             const globalQuestionIndex = getQuestionGlobalIndex(currentStageIndex, questionIndexInStage);
-
             // 移除同問題其他選項的 selected 狀態
             const options = selectedBtn.closest('.options-container').querySelectorAll('.option-btn');
             options.forEach(btn => btn.classList.remove('selected'));
-
             // 添加當前選項的 selected 狀態
             selectedBtn.classList.add('selected');
 
@@ -1040,7 +967,6 @@
 
             updateNavigationButtons(); // 每次選擇後更新按鈕狀態
         }
-
         // 更新導航按鈕狀態 (上一階段/下一階段/查看結果)
         function updateNavigationButtons() {
             // 上一階段按鈕
@@ -1049,7 +975,6 @@
             } else {
                 prevStageBtn.classList.add('hidden');
             }
-
             // 下一階段/查看結果按鈕
             const currentStageQuestions = stages[currentStageIndex].questions;
             let allAnsweredInCurrentStage = true;
@@ -1060,7 +985,6 @@
                     break;
                 }
             }
-
             if (currentStageIndex === stages.length - 1) {
                 nextStageBtn.innerText = '查看結果';
                 nextStageBtn.dataset.direction = 'result';
@@ -1068,7 +992,6 @@
                 nextStageBtn.innerText = '下一階段';
                 nextStageBtn.dataset.direction = 'next';
             }
-
             // 根據是否所有問題都已回答來啟用/禁用按鈕
             if (!allAnsweredInCurrentStage) {
                 nextStageBtn.classList.add('disabled');
@@ -1095,12 +1018,10 @@
                 }
             }
         }
-
         // 重新計算 MBTI 和九型人格分數 (雖然結果隨機，但保留此函數以供數據傳輸)
         function recalculateScores() {
             mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
             enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-
             let globalCounter = 0;
             stages.forEach(stage => {
                 stage.questions.forEach((q, qIndex) => {
@@ -1120,7 +1041,6 @@
                 });
             });
         }
-
         // 計算最終 MBTI 類型 (保留此函數以供數據傳輸)
         function calculateMBTI() {
             const e_i = mbtiScores.E >= mbtiScores.I ? 'E' : 'I';
@@ -1129,7 +1049,6 @@
             const j_p = mbtiScores.J >= mbtiScores.P ? 'J' : 'P';
             return e_i + s_n + t_f + j_p;
         }
-
         // 計算最終九型人格類型 (保留此函數以供數據傳輸)
         function calculateEnneagram() {
             let maxScore = -1;
@@ -1147,7 +1066,6 @@
             }
             return maxType ? `${maxType}號` : '未知類型';
         }
-
         // 隨機獲取 N 個不同的元素 (不包含特定元素)
         function getRandomUniqueElements(arr, count, excludeKeys = []) {
             const result = [];
@@ -1158,42 +1076,33 @@
             }
             return result;
         }
-
         // 計算並顯示結果
         function calculateAndShowResult() {
             recalculateScores();
-
             quizContainer.classList.add('hidden');
             introContainer.classList.add('hidden');
             moreDetailsContainer.classList.add('hidden'); // 確保更多詳情頁隱藏
             resultContainer.classList.remove('hidden');
             window.scrollTo(0, 0);
-
             const finalMBTI = calculateMBTI();
             const finalEnneagram = calculateEnneagram();
             console.log("最終 MBTI 類型: ", finalMBTI);
             console.log("最終九型人格類型: ", finalEnneagram);
             console.log("MBTI 原始分數: ", mbtiScores);
             console.log("九型人格原始分數: ", enneagramScores);
-
             // 核心修改：食物人格完全隨機選擇
             const allFoodKeys = Object.keys(foodPersonalities);
             const finalFoodPersonalityKey = allFoodKeys[Math.floor(Math.random() * allFoodKeys.length)];
             const matchedFood = foodPersonalities[finalFoodPersonalityKey];
-
             finalFoodPersonalityElement.innerHTML = `<span class="emoji">${matchedFood.emoji}</span> ${matchedFood.name}`;
             foodPersonalityDescriptionElement.innerText = matchedFood.description;
-
             // 顯示用戶姓名
             document.getElementById('userNameDisplay').innerText = userName || '你';
-
             // 隨機生成適合和不適合的食物 (固定為 2 個)
             const numSuitable = 2;
             const numUnsuitable = 2;
-
             const suitableFoodKeys = getRandomUniqueElements(allFoodKeys, numSuitable, [finalFoodPersonalityKey]);
             const unsuitableFoodKeys = getRandomUniqueElements(allFoodKeys, numUnsuitable, [finalFoodPersonalityKey, ...suitableFoodKeys]);
-
             // 清空並填充適合的食物網格
             suitableFoodsGrid.innerHTML = '';
             if (suitableFoodKeys.length > 0) {
@@ -1214,11 +1123,10 @@
                 noFoodMessage.innerText = '目前沒有特別合拍的食物。';
                 suitableFoodsGrid.appendChild(noFoodMessage);
             }
-
             // 清空並填充不適合的食物網格
             unsuitableFoodsGrid.innerHTML = '';
             if (unsuitableFoodKeys.length > 0) {
-                unsuitableFoodKeys.forEach(key => {
+                unsuitableUnsuitableKeys.forEach(key => {
                     const food = foodPersonalities[key];
                     // 移除了 randomReason 的顯示，只保留食物名稱和 emoji
                     const foodCard = document.createElement('div');
@@ -1239,7 +1147,6 @@
             // 觸發圖片生成和顯示
             generateAndDisplayResultImage(matchedFood, finalMBTI, finalEnneagram);
         }
-
         // 生成並顯示結果圖片
         function generateAndDisplayResultImage(matchedFood, mbti, enneagram) {
             // 在截圖前，確保回饋區塊、下載按鈕、更多詳情按鈕是隱藏的，避免截圖到
@@ -1247,7 +1154,6 @@
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
             saveImageHintText.classList.add('hidden');
             viewMoreDetailsBtn.classList.add('hidden'); // 隱藏更多詳情按鈕
-
             html2canvas(screenshotArea, {
                 useCORS: true,
                 allowTaint: true,
@@ -1256,13 +1162,10 @@
             }).then(canvas => {
                 const dataURL = canvas.toDataURL('image/png');
                 resultImagePreview.src = dataURL;
-
                 // 截圖完成後，隱藏原始的文字結果區塊
                 screenshotArea.classList.add('hidden');
-
                 // 顯示圖片預覽區塊
                 document.getElementById('image-display-area').classList.remove('hidden');
-
                 // 顯示回饋區塊和操作按鈕
                 feedbackSection.classList.remove('hidden');
                 if (downloadImageBtn) {
@@ -1282,8 +1185,6 @@
                 screenshotArea.classList.remove('hidden'); // 失敗時不隱藏原始文字區塊
             });
         }
-
-
         // 事件監聽器
         startQuizBtn.addEventListener('click', () => {
             userName = userNameInput.value.trim();
@@ -1293,25 +1194,20 @@
             userAnswers = {}; // 清空答案
             renderStage();
         });
-
         nextStageBtn.addEventListener('click', (event) => {
             navigateStage(event.target.dataset.direction);
         });
-
         prevStageBtn.addEventListener('click', (event) => {
             navigateStage(event.target.dataset.direction);
         });
-
         // 結果頁的重新測驗按鈕
         restartQuizBtn.addEventListener('click', () => {
             resetQuiz();
         });
-
         // 更多詳情頁的重新測驗按鈕
         restartQuizBtnFromDetails.addEventListener('click', () => {
             resetQuiz();
         });
-
         // 重置測驗狀態的函數
         function resetQuiz() {
             resultContainer.classList.add('hidden');
@@ -1322,7 +1218,6 @@
             userAnswers = {}; // 清空答案
             mbtiScores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
             enneagramScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-
             // 重置回饋按鈕狀態
             feedbackButtons.forEach(btn => {
                 btn.classList.remove('active');
@@ -1331,16 +1226,13 @@
             // 隱藏圖片預覽和下載按鈕/提示
             resultImagePreview.src = ''; // 清空圖片源
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
-            saveImageHintText.classList.add('hidden');
-            
+            saveImageHintText.classList.add('hidden');   
             // 確保回饋區塊和查看更多按鈕在重新測驗時是初始狀態
             feedbackSection.classList.remove('hidden'); // 顯示回饋區塊
             viewMoreDetailsBtn.classList.add('hidden'); // 隱藏查看更多按鈕
             screenshotArea.classList.remove('hidden'); // 重新測驗時顯示截圖區域，以便下次生成圖片
             document.getElementById('image-display-area').classList.add('hidden'); // 隱藏圖片顯示區塊
         }
-
-
         feedbackButtons.forEach(button => {
             button.addEventListener('click', (event) => {
                 // 視覺回饋：立即隱藏回饋區塊，顯示更多詳情按鈕
@@ -1348,12 +1240,10 @@
                 event.target.classList.add('active');
                 feedbackSection.classList.add('hidden'); // 立即隱藏回饋區塊
                 viewMoreDetailsBtn.classList.remove('hidden'); // 顯示查看更多按鈕
-
                 const feedbackType = event.target.dataset.feedback;
                 const finalMBTI = calculateMBTI(); // 再次計算以確保數據最新
                 const finalEnneagram = calculateEnneagram();
                 const finalFoodPersonality = finalFoodPersonalityElement.innerText.replace(/[\uD800-\uDBFF\uDC00-\uDFFF]/g, '').trim(); // 移除 emoji
-
                 const dataToSend = {
                     userName: userName,
                     foodPersonality: finalFoodPersonality,
@@ -1361,9 +1251,7 @@
                     enneagramType: finalEnneagram,
                     feedback: feedbackType
                 };
-
                 const backendApiUrl = 'https://food-quiz-python-backend.onrender.com/api/feedback'; // 確認 API URL
-
                 fetch(backendApiUrl, {
                     method: 'POST',
                     headers: {
@@ -1389,19 +1277,16 @@
                 });
             });
         });
-
         // 查看更多詳情按鈕事件
         viewMoreDetailsBtn.addEventListener('click', () => {
             resultContainer.classList.add('hidden');
             moreDetailsContainer.classList.remove('hidden');
             window.scrollTo(0, 0); // 滾動到頁面頂部
         });
-
         // 複製連結按鈕事件
         copyLinkBtn.addEventListener('click', () => {
             shareLinkInput.select(); // 選中文字
             shareLinkInput.setSelectionRange(0, 99999); // 針對行動裝置
-
             // 使用 document.execCommand('copy') 進行複製
             try {
                 const successful = document.execCommand('copy');
@@ -1412,15 +1297,12 @@
                 alert('複製失敗，請手動複製。');
             }
         });
-
-
         // 初始化：確保頁面加載時顯示歡迎頁面
         document.addEventListener('DOMContentLoaded', () => {
             introContainer.classList.remove('hidden');
             quizContainer.classList.add('hidden');
             resultContainer.classList.add('hidden');
             moreDetailsContainer.classList.add('hidden'); // 確保更多詳情頁預設隱藏
-
             // 確保初始狀態下下載按鈕和手機提示是隱藏的
             if (downloadImageBtn) downloadImageBtn.classList.add('hidden');
             saveImageHintText.classList.add('hidden');
@@ -1429,7 +1311,6 @@
             feedbackSection.classList.remove('hidden'); // 確保回饋區塊可見
             viewMoreDetailsBtn.classList.add('hidden'); // 確保查看更多按鈕隱藏
         });
-
         // JavaScript 代碼結束
     </script>
 </body>
